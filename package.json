@@ -1,0 +1,20 @@
+{
+  "name": "three-lab",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "http": "vite --host && tslint --exclude ./node_modules",
+    "https": "vite --host --https && tslint --exclude ./node_modules",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@types/three": "^0.152.1",
+    "three": "^0.154.0",
+    "typescript": "^5.1.6",
+    "vite": "^4.3.9"
+  }
+}
