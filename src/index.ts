@@ -89,6 +89,7 @@ window.addEventListener('DOMContentLoaded', () => {
     side: THREE.BackSide
   });
   const Sphere = new THREE.Mesh(gSphere, mSphere);
+  onAnimate.push(() => Sphere.lookAt(Camera.position));
 
   // Lights and FX
   const lAmbient = new THREE.AmbientLight(0xAC9CEF, 36);
@@ -115,6 +116,7 @@ window.addEventListener('DOMContentLoaded', () => {
     thickness: 20,
   });
   const IRIS = new THREE.Mesh(gIRIS, mIRIS);
+  onAnimate.push(() => IRIS.lookAt(Camera.position));
   Scene.add(IRIS);
 
   // Alpha & Omega arms
@@ -126,10 +128,22 @@ window.addEventListener('DOMContentLoaded', () => {
   });
   const AlphaArm = new THREE.Mesh(gArms, mArms);
   const OmegaArm = new THREE.Mesh(gArms, mArms);
-
   AlphaArm.position.set(0, +16 + 6, 0);
   OmegaArm.position.set(0, -16 - 6, 0);
 
+  onAnimate.push(() => {
+    // AlphaArm.lookAt(IRIS.position);
+    AlphaArm.rotation.set(0, 0, 0);
+    AlphaArm.position.set(0, +16+6 - Camera.rotation.y, 0);
+    // OmegaArm.lookAt(IRIS.position);
+  });
+
+  console.debug(
+    '\nAlpha Arm - Position:',AlphaArm.position,
+    '\nCamera - Position',Camera.position,
+    '\nAlpha Arm - Rotation',AlphaArm.rotation,
+    '\nCamera - Rotation',Camera.rotation
+  );
   Scene.add(
     AlphaArm,
     OmegaArm
