@@ -70,16 +70,6 @@ window.addEventListener('DOMContentLoaded', () => {
   composer.addPass(afterImage);
   composer.addPass(crt);
   
-  // Load the prefab design
-  const loader = new GLTFLoader();
-  loader.load('models/IRIS.glb', (gltf) => {
-    // gltf.scene.scale.set(11, 11, 11);
-    // onAnimate.push(() => {
-    //   gltf.scene.lookAt(Camera.position);
-    // });
-    // Camera.add(gltf.scene);
-    // Scene.add(gltf.scene);
-  });
 
   // Attempt at sphere with subsurface scattering
   const gSphere = new THREE.SphereGeometry(9, 36, 36);
@@ -173,6 +163,19 @@ window.addEventListener('DOMContentLoaded', () => {
   Scene.add(GridPoints);
   console.debug(GridPoints);
 
+  // Touch & Click recognition
+  window.addEventListener('pointerdown', pointer => {
+    console.debug(pointer);
+    const gPulse = new THREE.TorusGeometry();
+    const mPulse = new THREE.MeshBasicMaterial();
+    const Pulse = new THREE.Mesh(gPulse, mPulse);
+
+    onAnimate.push(() => {
+      Pulse.position.set(0, 0, -9);
+    });
+
+    Scene.add(Pulse);
+  });
 
   // Action!
   const controls = new OrbitControls(Camera, composer.renderer.domElement);
