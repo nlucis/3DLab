@@ -51,50 +51,9 @@ window.addEventListener('DOMContentLoaded', () => {
     Scene.background = new THREE.Color(0.024, 0.012, 0.024);
   }
   
-  // Post-Processing
-  const composer = new EffectComposer(Renderer);
-  composer.addPass(new TAARenderPass(Scene, Camera, 0xFFFFFF, 1));
-
-  const bloom = new UnrealBloomPass(
-    new THREE.Vector2(), 
-    /* Strength */0.369, 
-    /* Radius   */0.222, 
-    /* Threshold*/0.001
-  );
-  const afterImage = new AfterimagePass(0.6);
-  const smaa = new SMAAPass(window.innerWidth, window.innerHeight);
-  const crt = new FilmPass(0.6, 0.3, (window.innerHeight / 2) * 3, 0);
-  
-  composer.addPass(bloom);
-  composer.addPass(smaa);
-  composer.addPass(afterImage);
-  composer.addPass(crt);
-  
-
-  // Attempt at sphere with subsurface scattering
-  const gSphere = new THREE.SphereGeometry(9, 36, 36);
-  const mSphere = new THREE.MeshPhysicalMaterial({
-    name: 'sphere',
-    opacity: 0.36,
-    color: 0x2A1CAF,
-    transparent: true,
-
-    emissive: 0xFFFFFF,
-    emissiveIntensity: 0.24,
-    
-  // a slight clearcoat creates a softened edge that works well with bloom
-    clearcoat: 1,
-    clearcoatRoughness: 0.12,
-    transmission: 0.6,
-    side: THREE.BackSide
-  });
-  const Sphere = new THREE.Mesh(gSphere, mSphere);
-  onAnimate.push(() => Sphere.lookAt(Camera.position));
-
-  // Lights and FX
+  // Lights
   const lAmbient = new THREE.AmbientLight(0xAC9CEF, 36);
   Scene.add(
-    Sphere,
     lAmbient, 
   );
 
@@ -136,7 +95,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
 
 
-  // Point Sphere
+  // Info Sphere - Point Grid
   const gPoints = new THREE.IcosahedronGeometry(9, 12);
   const mPoints = new THREE.PointsMaterial({
     name: 'point-sphere',
@@ -146,8 +105,28 @@ window.addEventListener('DOMContentLoaded', () => {
     blending: THREE.AdditiveBlending,
   });
 
-  let opacityMax = 2.2;
-  let opacityMin = 0.6;
+  // // Info Sphere - Blue Shell
+  const gSphere = new THREE.SphereGeometry(9, 36, 36);
+  const mSphere = new THREE.MeshPhysicalMaterial({
+    name: 'sphere',
+    opacity: 0.36,
+    color: 0x2A1CAF,
+    transparent: true,
+
+    emissive: 0xFFFFFF,
+    emissiveIntensity: 0.24,
+    
+  // a slight clearcoat creates a softened edge that works well with bloom
+    clearcoat: 1,
+    clearcoatRoughness: 0.12,
+    transmission: 0.6,
+    side: THREE.BackSide
+  });
+  const Sphere = new THREE.Mesh(gSphere, mSphere);
+  onAnimate.push(() => Sphere.lookAt(Camera.position));
+
+  let opacityMax = 3.0;
+  let opacityMin = 0.3;
 
   // Simulate vox flashing
   setInterval(() => {
@@ -161,24 +140,35 @@ window.addEventListener('DOMContentLoaded', () => {
     GridPoints.rotation.y -= 0.003;
     GridPoints.rotation.z += 0.009;
   });
-  Scene.add(GridPoints);
-  console.debug(GridPoints);
+  Scene.add(
+    GridPoints,
+    Sphere
+  );
+  // Use this to get the actual vertex positions of the mesh's geometry
+  // const vertices = <number[]> gPoints.getAttribute('position').array;
+  // const pointVectors = <THREE.Vector3[]> [];
+
+
+  // Post-Processing & FX
+  const composer = new EffectComposer(Renderer);
+  composer.addPass(new TAARenderPass(Scene, Camera, 0xFFFFFF, 1));
+
+  const bloom = new UnrealBloomPass(
+    new THREE.Vector2(), 
+    /* Strength */0.369, 
+    /* Radius   */0.222, 
+    /* Threshold*/0.001
+  );
+  const afterImage = new AfterimagePass(0.6);
+  const smaa = new SMAAPass(window.innerWidth, window.innerHeight);
+  const crt = new FilmPass(0.6, 0.3, (window.innerHeight / 2) * 3, 0);
+  
+  composer.addPass(bloom);
+  composer.addPass(crt);
+  composer.addPass(afterImage);
+  composer.addPass(smaa);
 
   // Touch & Click recognition
-  window.addEventListener('pointerdown', pointer => {
-    console.debug(pointer);
-    const gPulse = new THREE.TorusGeometry();
-    const mPulse = new THREE.MeshBasicMaterial();
-    const Pulse = new THREE.Mesh(gPulse, mPulse);
-
-    onAnimate.push(() => {
-      Pulse.position.set(0, 0, -9);
-    });
-
-    Scene.add(Pulse);
-  });
-
-  // Action!
   const controls = new OrbitControls(Camera, composer.renderer.domElement);
   controls.target // how does one set this??
 
@@ -193,9 +183,20 @@ window.addEventListener('DOMContentLoaded', () => {
   controls.addEventListener('touchend', t => {});
 
   controls.enablePan = false;
-  controls.enableRotate = true;
   controls.enableZoom = false;
+  controls.enableRotate = true;
+  
+  controls.getDistance
+  controls.getPolarAngle
+  controls.getAzimuthalAngle
+  controls.maxPolarAngle
+  controls.maxAzimuthAngle
+  controls.rotateSpeed
+  
+  controls.touches
+  controls.mouseButtons
 
+  // Action!
   const render = () => {
     requestAnimationFrame(render);
     onAnimate.forEach(cb => cb());
