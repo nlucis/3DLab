@@ -180,6 +180,22 @@ window.addEventListener('DOMContentLoaded', () => {
 
   // Action!
   const controls = new OrbitControls(Camera, composer.renderer.domElement);
+  controls.target // how does one set this??
+
+  // Capture pointer events
+  controls.addEventListener('pointerup', p => {});
+  controls.addEventListener('pointerdown', p => {});
+  controls.addEventListener('pointermove', p => {});
+
+  // Capture touch events
+  controls.addEventListener('touchstart', t => {});
+  controls.addEventListener('touchmove', t => {});
+  controls.addEventListener('touchend', t => {});
+
+  controls.enablePan = false;
+  controls.enableRotate = true;
+  controls.enableZoom = false;
+
   const render = () => {
     requestAnimationFrame(render);
     onAnimate.forEach(cb => cb());
