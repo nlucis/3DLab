@@ -140,13 +140,45 @@ window.addEventListener('DOMContentLoaded', () => {
     GridPoints.rotation.y -= 0.003;
     GridPoints.rotation.z += 0.009;
   });
+  // Use this to get the actual vertex positions of the mesh's geometry
+  // const vertices = <number[]> gPoints.getAttribute('position').array;
+  // const pointVectors = <THREE.Vector3[]> [];
   Scene.add(
     GridPoints,
     Sphere
   );
-  // Use this to get the actual vertex positions of the mesh's geometry
-  // const vertices = <number[]> gPoints.getAttribute('position').array;
-  // const pointVectors = <THREE.Vector3[]> [];
+
+
+  // Centroid - Selection ring that an interactible aligns with to be slid off the orbital and into a slot stack
+  // Slot Stacks - where interactibles are sorted and ordered in a vertical linear fashion, or discarded
+  // Orbital Zone - point sphere cloud where dynamic interactibles are added and displayed
+  // Interactibles - Discrete visual representations of various data - text, images, videos, sound files, or maps
+  const testInteractible = new THREE.Group();
+
+  // Since only one side of the i-ble is shown, 2D geometry is used
+  const gTestInteract_Inner = new THREE.CircleGeometry(0.6, 64);
+  const gTestInteract_Outer = new THREE.RingGeometry(0.9, 1.6, 64, 64);
+  const mTestInteract_Inner = new THREE.MeshBasicMaterial({color: 0xFF0000});
+  const mTestInteract_Outer = new THREE.MeshBasicMaterial({color: 0xFFFFFF});
+  const gInteractBG = new THREE.CircleGeometry(1.6, 64);
+  const mInteractBG = new THREE.MeshBasicMaterial({ color: 0x000000 });
+  const InteractibleInner = new THREE.Mesh(gTestInteract_Inner, mTestInteract_Inner);
+  const InteractibleOuter = new THREE.Mesh(gTestInteract_Outer, mTestInteract_Outer);
+  const InteractibleBackground = new THREE.Mesh(gInteractBG, mInteractBG);
+
+  // z-ordering
+  InteractibleInner.position.setZ(2);
+  InteractibleOuter.position.setZ(1);
+  InteractibleBackground.position.setZ(0);
+  testInteractible.add(
+    InteractibleInner,
+    InteractibleOuter,
+    InteractibleBackground,
+  );
+
+  // Ensure that the visible side is always facing the camera
+  onAnimate.push(() => testInteractible.lookAt(Camera.position));
+  Scene.add(testInteractible);
 
 
   // Post-Processing & FX
