@@ -151,34 +151,73 @@ window.addEventListener('DOMContentLoaded', () => {
 
   // Centroid - Selection ring that an interactible aligns with to be slid off the orbital and into a slot stack
   // Slot Stacks - where interactibles are sorted and ordered in a vertical linear fashion, or discarded
-  // Orbital Zone - point sphere cloud where dynamic interactibles are added and displayed
-  // Interactibles - Discrete visual representations of various data - text, images, videos, sound files, or maps
-  const testInteractible = new THREE.Group();
 
-  // Since only one side of the i-ble is shown, 2D geometry is used
-  const gTestInteract_Inner = new THREE.CircleGeometry(0.6, 64);
+  // Visualizer ring for the orbital zone | overlaps with the centroid UI
+  let r = 14.2;
+  let w = 0.6;
+  const gOrbitalZone = new THREE.RingGeometry(r - w, r, 64, 64);
+  const OrbitalZone = new THREE.Mesh(gOrbitalZone, mArms);
+  onAnimate.push(() => {
+    OrbitalZone.lookAt(Camera.position);
+  });
+  // Orbital Zone - point sphere cloud where dynamic interactibles are added and displayed | since it is just a list of points, no material or mesh is needed
+  const gOrbitalSphere = new THREE.IcosahedronGeometry(w + (r * 1.2), 1);
+  const rawCoords = <number[]> gOrbitalSphere.getAttribute('position').array;
+  const vecCoords = <THREE.Vector3[]> [];
+  for (let n = 0; n < rawCoords.length / 3; n += 3) vecCoords.push(new THREE.Vector3(rawCoords[n+0], rawCoords[n+1], rawCoords[n+2]));
+  
+  Scene.add(
+    OrbitalZone
+  );
+  
+  // Interactibles - Discrete visual representations of various data - text, images, videos, sound files, or maps
+  const TestInteractible = new THREE.Group();
+
+  // Since only one side of the i-ble is shown, 2D geometry is used | TODO: convert this to a factory class
+  const gTestInteract_Inner = new THREE.CircleGeometry(0.3, 64);
   const gTestInteract_Outer = new THREE.RingGeometry(0.9, 1.6, 64, 64);
-  const mTestInteract_Inner = new THREE.MeshBasicMaterial({color: 0xFF0000});
-  const mTestInteract_Outer = new THREE.MeshBasicMaterial({color: 0xFFFFFF});
-  const gInteractBG = new THREE.CircleGeometry(1.6, 64);
+  const mInteractible = new THREE.MeshPhysicalMaterial({
+    color: 0xFFFFFF,
+    emissive: 0xFFFFFF,
+    emissiveIntensity: 9,
+    transparent: true,
+    opacity: 2,
+    transmission: 0.369
+  });
+  const gInteractBG = new THREE.CircleGeometry(1.6 + 0.3, 64);
   const mInteractBG = new THREE.MeshBasicMaterial({ color: 0x000000 });
-  const InteractibleInner = new THREE.Mesh(gTestInteract_Inner, mTestInteract_Inner);
-  const InteractibleOuter = new THREE.Mesh(gTestInteract_Outer, mTestInteract_Outer);
+  const InteractibleInner = new THREE.Mesh(gTestInteract_Inner, mInteractible);
+  const InteractibleOuter = new THREE.Mesh(gTestInteract_Outer, mInteractible);
   const InteractibleBackground = new THREE.Mesh(gInteractBG, mInteractBG);
 
   // z-ordering
   InteractibleInner.position.setZ(2);
   InteractibleOuter.position.setZ(1);
   InteractibleBackground.position.setZ(0);
-  testInteractible.add(
+  TestInteractible.add(
     InteractibleInner,
     InteractibleOuter,
     InteractibleBackground,
   );
 
   // Ensure that the visible side is always facing the camera
-  onAnimate.push(() => testInteractible.lookAt(Camera.position));
-  Scene.add(testInteractible);
+  const posID = 0;
+  onAnimate.push(() => {
+    TestInteractible.lookAt(Camera.position);
+    TestInteractible.position.set(vecCoords[posID].x, vecCoords[posID].y, vecCoords[posID].z);
+
+    // Why does this change the value of the target vector? Who thought that was a good idea??
+    const tempVector = new THREE.Vector3(InteractibleOuter.position.x, InteractibleOuter.position.y, InteractibleOuter.position.z);
+    Camera.getWorldPosition(tempVector); // would otherwise be useful
+    
+    console.debug(
+    );
+
+    // if (TestInteractible.position.z < Sphere.position.z) {
+    //   InteractibleOuter.visible = false;
+    // }
+  });
+  Scene.add(TestInteractible);
 
 
   // Post-Processing & FX
