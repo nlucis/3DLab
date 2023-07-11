@@ -12,8 +12,23 @@ body {
   overflow: hidden;
 }
 
+#text-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: transparent;
+  pointer-events: none;
+  z-index: 2;
+}
 #target {
+  position: absolute;
+  top: 0;
+  left: 0;
   width: 100%;
   height: 100%;
   background-color: black;
+  pointer-events: all;
+  z-index: 1;
 }
