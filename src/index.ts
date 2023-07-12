@@ -36,6 +36,11 @@ window.addEventListener('DOMContentLoaded', () => {
   controls.radiusFactor = 120;
   controls.enableAnimations = true;
 
+  // Allow rotation only
+  controls.enablePan = false;
+  controls.enableZoom = false;
+  controls.enableRotate = true;
+
   // IRIS Ring
   const gIRIS = new THREE.TorusGeometry(12, 1, 64, 64);
   const mIRIS = new THREE.MeshPhysicalMaterial({
@@ -58,14 +63,10 @@ window.addEventListener('DOMContentLoaded', () => {
   const gOculum_Cone = new THREE.ConeGeometry(0.6, 1, 4);
   const gOculum_Ring = new THREE.TorusGeometry(1, 0.12);
   const mOculum = new THREE.MeshBasicMaterial({ color: 0xFF0000, transparent: true, opacity: 0.36 });
-  // const mOcDisc = new THREE.MeshBasicMaterial({ color: 0x22ACFF, transparent: true, opacity: 0.36 });
-  // const oculumDisc = new THREE.Mesh(gOculum_Disc, mOcDisc);
   const oculumCone = new THREE.Mesh(gOculum_Cone, mOculum);
   const oculumRing = new THREE.Mesh(gOculum_Ring, mOculum);
 
   oculumCone.position.y = +0.3;
-  // oculumDisc.position.y = -0.6;
-  // oculumDisc.scale.set(1, 0.3, 1);
 
   const Oculum = new THREE.Group().add(
     oculumCone, 
@@ -212,19 +213,28 @@ window.addEventListener('DOMContentLoaded', () => {
   composer.addPass(smaa);
 
   // Touch & Click recognition
+  const mInteractron_Edge = new THREE.MeshBasicMaterial();
+  const mInteractron_Core = new THREE.MeshBasicMaterial();
+  const gInteractron_Edge = new THREE.TorusGeometry();
+  const gInteractron_Core = new THREE.CircleGeometry();
+
+  const Interactron = new THREE.Group();
+  const interactronEdge = new THREE.Mesh(gInteractron_Edge, mInteractron_Edge);
+  const interactronCore = new THREE.Mesh(gInteractron_Core, mInteractron_Core);
+  Interactron.add(interactronEdge, interactronCore).visible = false;
+  Scene.add(Interactron);
+
   // Capture pointer events
-  controls.addEventListener('pointerup', p => {});
-  controls.addEventListener('pointerdown', p => {});
-  controls.addEventListener('pointermove', p => {});
+  target.addEventListener('pointerup', p => {});
+  target.addEventListener('pointerdown', p => {
+    Interactron.visible = true;
+  });
+  target.addEventListener('pointermove', p => {});
 
   // Capture touch events
-  controls.addEventListener('touchstart', t => {});
-  controls.addEventListener('touchmove', t => {});
-  controls.addEventListener('touchend', t => {});
-
-  controls.enablePan = false;
-  controls.enableZoom = false;
-  controls.enableRotate = true;
+  target.addEventListener('touchstart', t => {});
+  target.addEventListener('touchmove', t => {});
+  target.addEventListener('touchend', t => {});
 
   // Action!
   const render = () => {
