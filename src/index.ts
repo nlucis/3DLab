@@ -67,12 +67,9 @@ window.addEventListener('DOMContentLoaded', () => {
   const oculumRing = new THREE.Mesh(gOculum_Ring, mOculum);
 
   oculumCone.position.y = +0.3;
+  oculumCone.scale.set(1.3, 1, 1);
 
-  const Oculum = new THREE.Group().add(
-    oculumCone, 
-    oculumRing, 
-    // oculumDisc
-  );
+  const Oculum = new THREE.Group().add(oculumCone, oculumRing);
   Oculum.rotation.z = THREE.MathUtils.degToRad(180);
   Scene.add(Oculum);
 
