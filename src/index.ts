@@ -96,6 +96,7 @@ window.addEventListener('DOMContentLoaded', () => {
   onAnimate.push(() => {
     IRIS.lookAt(Camera.position);
     staticOrbit.lookAt(Camera.position);
+    staticOrbit.rotation.set(Camera.rotation.x, Camera.rotation.y, Camera.rotation.z);
   });
   Scene.add(IRIS, staticOrbit);
 
