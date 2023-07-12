@@ -1,5 +1,7 @@
 import * as THREE from 'three';
+import * as PIXI from 'pixi.js';
 import { SMAAPass } from 'three/examples/jsm/postprocessing/SMAAPass';
+import { TexturePass } from 'three/examples/jsm/postprocessing/TexturePass';
 import { TAARenderPass } from 'three/examples/jsm/postprocessing/TAARenderPass';
 import {UnrealBloomPass} from 'three/examples/jsm/postprocessing/UnrealBloomPass';
 import {AfterimagePass } from 'three/examples/jsm/postprocessing/AfterimagePass';
@@ -30,11 +32,11 @@ window.addEventListener('DOMContentLoaded', () => {
 
   // controls...
   const controls = new ArcballControls(Camera, target, Scene);
-  controls.setGizmosVisible(false);
   controls.camera = Camera;
   controls.setTbRadius(0.3);
   controls.radiusFactor = 120;
   controls.enableAnimations = true;
+  controls.setGizmosVisible(false);
 
   // Allow rotation only
   controls.enablePan = false;
@@ -115,7 +117,6 @@ window.addEventListener('DOMContentLoaded', () => {
     blending: THREE.AdditiveBlending,
   });
 
-
   // Simulate vox flashing
   // let opacityMax = 3.0;
   // let opacityMin = 0.3;
@@ -190,31 +191,41 @@ window.addEventListener('DOMContentLoaded', () => {
   const Backdrop = new THREE.Mesh(gBackdrop, mBackdrop);
   Scene.add(Backdrop);
 
-  // Touch & Click recognition
-  const Cursor = new THREE.Vector2();
-  let inWindow = false;
-  let M: MouseEvent;
-
-  // Check that window contains cursor
-  target.onmousemove = m => { M = m };
-  target.onmouseenter = m => {inWindow = true;};
-  target.onmouseleave = m => {inWindow = false;};
-
   // Draw interactron via Pixi.js for 2D plane alignment
-
-  // Capture pointer events
-  target.addEventListener('pointerup', p => {
-    // Interactron.visible = false;
+  const overlay = new PIXI.Application({
+    antialias: true,
+    autoStart: true,
+    backgroundAlpha: 0,
+    width: window.innerWidth,
+    height: window.innerHeight,
+    // view: document.getElementById('overlay') as HTMLCanvasElement,
+    view: new OffscreenCanvas(window.innerWidth, window.innerHeight)
   });
-  target.addEventListener('pointerdown', p => {
-    // Interactron.visible = true;
-  });
-  target.addEventListener('pointermove', p => {});
+  const cx = window.innerWidth / 2;
+  const cy = window.innerHeight / 2;
 
-  // Capture touch events
-  target.addEventListener('touchstart', t => {});
-  target.addEventListener('touchmove', t => {});
-  target.addEventListener('touchend', t => {});
+  const Interactron = new PIXI.Graphics();
+  Interactron.lineStyle(6, 0xFFFFFF);
+  Interactron.drawCircle(cx, cy, 24);
+  overlay.stage.addChild(Interactron);
+
+  /* --- Touch & Click recognition --- */
+  // // Capture pointer events
+  // target.addEventListener('pointerup', p => {
+  //   // Interactron.visible = false;
+  // });
+  // target.addEventListener('pointerdown', p => {
+  //   // Interactron.visible = true;
+  // });
+  // target.addEventListener('pointermove', p => {});
+
+  // // Capture touch events
+  // target.addEventListener('touchstart', t => {});
+  // target.addEventListener('touchmove', t => {});
+  // target.addEventListener('touchend', t => {});
+
+  // Convert the Pixi view to a texture for Three to render
+  const overlayTex = new THREE.CanvasTexture(overlay.view as OffscreenCanvas);
 
   // Post-Processing
   const composer = new EffectComposer(Renderer);
@@ -226,7 +237,8 @@ window.addEventListener('DOMContentLoaded', () => {
   );
   const afterImage = new AfterimagePass(0.72);
   const smaa = new SMAAPass(window.innerWidth, window.innerHeight);
-  composer.addPass(new TAARenderPass(Scene, Camera, 0xFFFFFF, 0.5));
+  composer.addPass(new TAARenderPass(Scene, Camera, 0xFFFFFF, 0.9));
+  composer.addPass(new TexturePass(overlayTex, 0.9 /* must be a value less than 1 or the TAA pass wont show */));
   composer.addPass(bloom);
   composer.addPass(afterImage);
   composer.addPass(smaa);
@@ -235,7 +247,9 @@ window.addEventListener('DOMContentLoaded', () => {
   const render = () => {
     requestAnimationFrame(render);
     Camera.updateProjectionMatrix();
+    overlayTex.needsUpdate = true;
     onAnimate.forEach(cb => cb());
+    overlay.render();
     composer.render();
   };
   render();
