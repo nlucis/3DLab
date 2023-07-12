@@ -198,7 +198,6 @@ window.addEventListener('DOMContentLoaded', () => {
     backgroundAlpha: 0,
     width: window.innerWidth,
     height: window.innerHeight,
-    // view: document.getElementById('overlay') as HTMLCanvasElement,
     view: new OffscreenCanvas(window.innerWidth, window.innerHeight)
   });
   const cx = window.innerWidth / 2;
