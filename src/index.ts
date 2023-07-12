@@ -200,12 +200,36 @@ window.addEventListener('DOMContentLoaded', () => {
     height: window.innerHeight,
     view: new OffscreenCanvas(window.innerWidth, window.innerHeight)
   });
+
+  let isDown = false;
+  let inFocus = false;
+
   const cx = window.innerWidth / 2;
   const cy = window.innerHeight / 2;
 
+  // Draw the cursor
+  const Cursor = new THREE.Vector2(cx, cy);
   const Interactron = new PIXI.Graphics();
-  Interactron.lineStyle(6, 0xFFFFFF);
-  Interactron.drawCircle(cx, cy, 24);
+
+  target.onmouseenter = m => inFocus = true;
+  target.onmouseleave = m => inFocus = false;
+  target.onmousedown = () => isDown = true;
+  target.onmouseup = () => isDown = false;
+
+  const updateCursor   = (mouse: MouseEvent) => { Cursor.set(mouse.clientX, mouse.clientY)};
+  window.onmousemove   = updateCursor;
+  window.onpointermove = updateCursor;
+
+  onAnimate.push(() => {
+    // Reset cursor position when pointer leaves the window
+    !inFocus && Cursor.set(cx, cy);
+    
+    Interactron.clear();
+    Interactron.lineStyle(6, 0xFFFFFF);
+
+    // When clicked down or touched, show the interactron
+    if (isDown) Interactron.drawCircle(Cursor.x, Cursor.y, 24);
+  });
   overlay.stage.addChild(Interactron);
 
   /* --- Touch & Click recognition --- */
