@@ -61,18 +61,16 @@ window.addEventListener('DOMContentLoaded', () => {
     thickness: 20,
   });
   const IRIS = new THREE.Mesh(gIRIS, mIRIS);
-  const gOculum_Cone = new THREE.ConeGeometry(0.6, 1, 4);
-  const gOculum_Ring = new THREE.TorusGeometry(1, 0.12);
-  const mOculum = new THREE.MeshBasicMaterial({ color: 0xFF0000, transparent: true, opacity: 0.36 });
-  const oculumCone = new THREE.Mesh(gOculum_Cone, mOculum);
-  const oculumRing = new THREE.Mesh(gOculum_Ring, mOculum);
+  const gOculum_Edge = new THREE.BoxGeometry(1.3, 1.3, 1.3, 3, 3, 3);
+  const gOculum_Core = new THREE.BoxGeometry(0.6, 0.6, 0.6, 3, 3, 3);
+  const mOculum_Edge = new THREE.MeshBasicMaterial({ color: 0x00ACFF, transparent: true, opacity: 0.72, side: THREE.BackSide });
+  const mOculum_Core = new THREE.MeshBasicMaterial({ color: 0xFFAC00, transparent: true, opacity: 0.72, side: THREE.DoubleSide });
+  const oculumEdge = new THREE.Mesh(gOculum_Edge, mOculum_Edge);
+  const oculumCore = new THREE.Mesh(gOculum_Core, mOculum_Core);
 
-  oculumCone.position.y = +0.3;
-  oculumCone.scale.set(1.3, 1, 1);
-
-  const Oculum = new THREE.Group().add(oculumCone, oculumRing);
-  Oculum.rotation.z = THREE.MathUtils.degToRad(180);
-  Scene.add(Oculum);
+  // const Oculum = new InteractiveGroup(Renderer, Camera).add(oculumEdge, oculumCore);
+  // Oculum.rotation.z = THREE.MathUtils.degToRad(180);
+  Scene.add(oculumCore, oculumEdge);
 
   // Alpha & Omega arms
   const gArms = new THREE.CapsuleGeometry(0.3, 16);
@@ -211,43 +209,53 @@ window.addEventListener('DOMContentLoaded', () => {
   const Cursor = new THREE.Vector2(cx, cy);
   const Interactron = new PIXI.Graphics();
 
+  // Test: Setup an interactive area for the text toggle
+  const toggleArea = (
+    new PIXI.Graphics()
+      .lineStyle(2, 0xFF0000)
+      .drawCircle(cx, cy, 24)
+  );
+  toggleArea.eventMode = 'passive';
+  overlay.stage.addChild(toggleArea);
+
+
+  /* --- Touch & Click handlers --- */
   target.onmouseenter = m => inFocus = true;
   target.onmouseleave = m => inFocus = false;
-  target.onmousedown = () => isDown = true;
-  target.onmouseup = () => isDown = false;
 
+  target.onmousedown  = () => isDown = true;
+  target.onmouseup    = () => isDown = false;
+
+  target.ontouchstart = t => {};
+  target.ontouchend   = t => {};
+
+  // Track current pointer position
   const updateCursor   = (mouse: MouseEvent) => { Cursor.set(mouse.clientX, mouse.clientY)};
   window.onmousemove   = updateCursor;
   window.onpointermove = updateCursor;
 
+  const circleArea = new PIXI.Circle(cx, cy, 24);
   onAnimate.push(() => {
+
+    if (isDown && circleArea.contains(Cursor.x, Cursor.y)) console.debug('toggle on text overlay');
+    
     // Reset cursor position when pointer leaves the window
     !inFocus && Cursor.set(cx, cy);
-    
+
+    // Set the draw styles
     Interactron.clear();
     Interactron.lineStyle(6, 0xFFFFFF);
 
     // When clicked down or touched, show the interactron
-    if (isDown) Interactron.drawCircle(Cursor.x, Cursor.y, 24);
+    if (isDown) {
+      Interactron.beginFill(0x229CEF, 0.64);
+      Interactron.drawCircle(Cursor.x, Cursor.y, 24);
+      Interactron.endFill();
+    }
   });
-  overlay.stage.addChild(Interactron);
-
-  /* --- Touch & Click recognition --- */
-  // // Capture pointer events
-  // target.addEventListener('pointerup', p => {
-  //   // Interactron.visible = false;
-  // });
-  // target.addEventListener('pointerdown', p => {
-  //   // Interactron.visible = true;
-  // });
-  // target.addEventListener('pointermove', p => {});
-
-  // // Capture touch events
-  // target.addEventListener('touchstart', t => {});
-  // target.addEventListener('touchmove', t => {});
-  // target.addEventListener('touchend', t => {});
 
   // Convert the Pixi view to a texture for Three to render
+  overlay.stage.addChild(Interactron);
   const overlayTex = new THREE.CanvasTexture(overlay.view as OffscreenCanvas);
 
   // Post-Processing
