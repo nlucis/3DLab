@@ -28,6 +28,14 @@ window.addEventListener('DOMContentLoaded', () => {
   Camera.position.set(0, 0, -100);
   Scene.background = new THREE.Color(0.024, 0.012, 0.024);
 
+  // controls...
+  const controls = new ArcballControls(Camera, target, Scene);
+  // controls.setGizmosVisible(false);
+  controls.camera = Camera;
+  controls.setTbRadius(0.3);
+  controls.radiusFactor = 120;
+  controls.enableAnimations = true;
+
   // IRIS Ring
   const gIRIS = new THREE.TorusGeometry(12, 1, 64, 64);
   const mIRIS = new THREE.MeshPhysicalMaterial({
@@ -46,6 +54,18 @@ window.addEventListener('DOMContentLoaded', () => {
     thickness: 20,
   });
   const IRIS = new THREE.Mesh(gIRIS, mIRIS);
+  const gOculum_Cone = new THREE.ConeGeometry(0.6, 1, 4);
+  const gOculum_Ring = new THREE.TorusGeometry(1, 0.12);
+  const mOculum = new THREE.MeshBasicMaterial({ color: 0xFF0000 });
+  const oculumCone = new THREE.Mesh(gOculum_Cone, mOculum);
+  const oculumRing = new THREE.Mesh(gOculum_Ring, mOculum);
+
+  oculumCone.position.y = 0.3;
+
+  const Oculum = new THREE.Group().add(oculumCone, oculumRing);
+  Oculum.rotation.z = THREE.MathUtils.degToRad(180);
+  onAnimate.push(() => Oculum.lookAt(Camera.position));
+  Scene.add(Oculum);
 
   // Alpha & Omega arms
   const gArms = new THREE.CapsuleGeometry(0.3, 16);
@@ -56,15 +76,28 @@ window.addEventListener('DOMContentLoaded', () => {
   });
   const AlphaArm = new THREE.Mesh(gArms, mArms);
   const OmegaArm = new THREE.Mesh(gArms, mArms);
-  AlphaArm.position.set(0, +16 + 6, 0);
   OmegaArm.position.set(0, -16 - 6, 0);
+  AlphaArm.position.set(0, +16 + 6, 0);
+
+
+    // Visualizer ring for the orbital zone | overlaps with the centroid UI
+  let r = 14.2;
+  let w = 0.6;
+  const gOrbitalZone = new THREE.RingGeometry(r - w, r, 64, 64);
+  const OrbitalZone = new THREE.Mesh(gOrbitalZone, mArms);
+
+  const staticOrbit = new THREE.Group();
+  staticOrbit.add(
+    AlphaArm,
+    OrbitalZone,
+    OmegaArm
+  );
 
   onAnimate.push(() => {
     IRIS.lookAt(Camera.position);
+    staticOrbit.lookAt(Camera.position);
   });
-  Scene.add(
-    IRIS, 
-  );
+  Scene.add(IRIS, staticOrbit);
 
   // Info Sphere - Point Grid
   const gPoints = new THREE.IcosahedronGeometry(9, 12);
@@ -76,10 +109,10 @@ window.addEventListener('DOMContentLoaded', () => {
     blending: THREE.AdditiveBlending,
   });
 
-  let opacityMax = 3.0;
-  let opacityMin = 0.3;
 
   // Simulate vox flashing
+  // let opacityMax = 3.0;
+  // let opacityMin = 0.3;
   // setInterval(() => {
   //   mPoints.opacity = THREE.MathUtils.randFloat(opacityMin, opacityMax);
   //   mPoints.size = THREE.MathUtils.randFloat(0.3, 0.6);
@@ -97,20 +130,12 @@ window.addEventListener('DOMContentLoaded', () => {
   // Centroid - Selection ring that an interactible aligns with to be slid off the orbital and into a slot stack
   // Slot Stacks - where interactibles are sorted and ordered in a vertical linear fashion, or discarded
 
-  // Visualizer ring for the orbital zone | overlaps with the centroid UI
-  let r = 14.2;
-  let w = 0.6;
-  const gOrbitalZone = new THREE.RingGeometry(r - w, r, 64, 64);
-  const OrbitalZone = new THREE.Mesh(gOrbitalZone, mArms);
-  onAnimate.push(() => OrbitalZone.lookAt(Camera.position));
-
   // Orbital Zone - point sphere cloud where dynamic interactibles are added and displayed | since it is just a list of points, no material or mesh is needed
   const gOrbitalSphere = new THREE.IcosahedronGeometry(w + (r * 1.2), 1);
   const rawCoords = <number[]> gOrbitalSphere.getAttribute('position').array;
   const vecCoords = <THREE.Vector3[]> [];
   for (let n = 0; n < rawCoords.length / 3; n += 3) vecCoords.push(new THREE.Vector3(rawCoords[n+0], rawCoords[n+1], rawCoords[n+2]));
 
-  Scene.add(OrbitalZone);
   
   // Interactibles - Discrete visual representations of various data - text, images, videos, sound files, or maps
   const TestInteractible = new THREE.Group();
@@ -178,9 +203,6 @@ window.addEventListener('DOMContentLoaded', () => {
   composer.addPass(smaa);
 
   // Touch & Click recognition
-  const controls = new ArcballControls(Camera, composer.renderer.domElement, Scene);
-  controls.setGizmosVisible(false);
-
   // Capture pointer events
   controls.addEventListener('pointerup', p => {});
   controls.addEventListener('pointerdown', p => {});
