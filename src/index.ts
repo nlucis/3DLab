@@ -209,36 +209,34 @@ window.addEventListener('DOMContentLoaded', () => {
   const Cursor = new THREE.Vector2(cx, cy);
   const Interactron = new PIXI.Graphics();
 
-  // Test: Setup an interactive area for the text toggle
-  const toggleArea = (
-    new PIXI.Graphics()
-      .lineStyle(2, 0xFF0000)
-      .drawCircle(cx, cy, 24)
-  );
-  toggleArea.eventMode = 'passive';
-  overlay.stage.addChild(toggleArea);
-
-
   /* --- Touch & Click handlers --- */
   target.onmouseenter = m => inFocus = true;
   target.onmouseleave = m => inFocus = false;
 
-  target.onmousedown  = () => isDown = true;
-  target.onmouseup    = () => isDown = false;
+  target.onmousedown  = () => {isDown = true;  handleClicks()};
+  target.onmouseup    = () => {isDown = false; handleClicks()};
 
   target.ontouchstart = t => {};
   target.ontouchend   = t => {};
+
+  const handleClicks = () => {
+    // Handle toggling the text display when center of app is clicked
+    if (isDown && textToggle.contains(Cursor.x, Cursor.y)) toggleTextOverlay();
+  };
 
   // Track current pointer position
   const updateCursor   = (mouse: MouseEvent) => { Cursor.set(mouse.clientX, mouse.clientY)};
   window.onmousemove   = updateCursor;
   window.onpointermove = updateCursor;
 
-  const circleArea = new PIXI.Circle(cx, cy, 24);
+  let showText = false;
+  const textToggle = new PIXI.Circle(cx, cy, 16);
+  const toggleTextOverlay = () => {
+    console.debug(`toggle ${showText && 'on' || 'off'} text overlay`);
+    showText = !showText;
+  };
   onAnimate.push(() => {
 
-    if (isDown && circleArea.contains(Cursor.x, Cursor.y)) console.debug('toggle on text overlay');
-    
     // Reset cursor position when pointer leaves the window
     !inFocus && Cursor.set(cx, cy);
 
