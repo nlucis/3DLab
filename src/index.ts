@@ -222,7 +222,9 @@ window.addEventListener('DOMContentLoaded', () => {
   Scene.add(Interactron);
 
   // Capture pointer events
-  target.addEventListener('pointerup', p => {});
+  target.addEventListener('pointerup', p => {
+    Interactron.visible = false;
+  });
   target.addEventListener('pointerdown', p => {
     Interactron.visible = true;
   });
