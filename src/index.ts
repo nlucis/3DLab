@@ -59,10 +59,12 @@ window.addEventListener('DOMContentLoaded', () => {
   AlphaArm.position.set(0, +16 + 6, 0);
   OmegaArm.position.set(0, -16 - 6, 0);
 
-  const statics = new THREE.Group();
-  statics.add(IRIS, AlphaArm, OmegaArm);
-  onAnimate.push(() => statics.lookAt(Camera.position));
-  Scene.add(statics);
+  onAnimate.push(() => {
+    IRIS.lookAt(Camera.position);
+  });
+  Scene.add(
+    IRIS, 
+  );
 
   // Info Sphere - Point Grid
   const gPoints = new THREE.IcosahedronGeometry(9, 12);
@@ -161,7 +163,6 @@ window.addEventListener('DOMContentLoaded', () => {
 
   // Post-Processing & FX
   const composer = new EffectComposer(Renderer);
-  composer.addPass(new TAARenderPass(Scene, Camera, 0xFFFFFF, 1));
 
   const bloom = new UnrealBloomPass(
     new THREE.Vector2(), 
@@ -171,7 +172,7 @@ window.addEventListener('DOMContentLoaded', () => {
   );
   const afterImage = new AfterimagePass(0.72);
   const smaa = new SMAAPass(window.innerWidth, window.innerHeight);
-  
+  composer.addPass(new TAARenderPass(Scene, Camera, 0xFFFFFF, 0.5));
   composer.addPass(bloom);
   composer.addPass(afterImage);
   composer.addPass(smaa);
@@ -189,7 +190,6 @@ window.addEventListener('DOMContentLoaded', () => {
   controls.addEventListener('touchstart', t => {});
   controls.addEventListener('touchmove', t => {});
   controls.addEventListener('touchend', t => {});
-  controls
 
   controls.enablePan = false;
   controls.enableZoom = false;
