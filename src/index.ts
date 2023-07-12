@@ -59,7 +59,6 @@ window.addEventListener('DOMContentLoaded', () => {
     thickness: 20,
   });
   const IRIS = new THREE.Mesh(gIRIS, mIRIS);
-  const gOculum_Disc = new THREE.SphereGeometry(0.6);
   const gOculum_Cone = new THREE.ConeGeometry(0.6, 1, 4);
   const gOculum_Ring = new THREE.TorusGeometry(1, 0.12);
   const mOculum = new THREE.MeshBasicMaterial({ color: 0xFF0000, transparent: true, opacity: 0.36 });
@@ -142,7 +141,6 @@ window.addEventListener('DOMContentLoaded', () => {
   const rawCoords = <number[]> gOrbitalSphere.getAttribute('position').array;
   const vecCoords = <THREE.Vector3[]> [];
   for (let n = 0; n < rawCoords.length / 3; n += 3) vecCoords.push(new THREE.Vector3(rawCoords[n+0], rawCoords[n+1], rawCoords[n+2]));
-
   
   // Interactibles - Discrete visual representations of various data - text, images, videos, sound files, or maps
   const TestInteractible = new THREE.Group();
@@ -192,10 +190,34 @@ window.addEventListener('DOMContentLoaded', () => {
   const Backdrop = new THREE.Mesh(gBackdrop, mBackdrop);
   Scene.add(Backdrop);
 
+  // Touch & Click recognition
+  const Cursor = new THREE.Vector2();
+  let inWindow = false;
+  let M: MouseEvent;
 
-  // Post-Processing & FX
+  // Check that window contains cursor
+  target.onmousemove = m => { M = m };
+  target.onmouseenter = m => {inWindow = true;};
+  target.onmouseleave = m => {inWindow = false;};
+
+  // Draw interactron via Pixi.js for 2D plane alignment
+
+  // Capture pointer events
+  target.addEventListener('pointerup', p => {
+    // Interactron.visible = false;
+  });
+  target.addEventListener('pointerdown', p => {
+    // Interactron.visible = true;
+  });
+  target.addEventListener('pointermove', p => {});
+
+  // Capture touch events
+  target.addEventListener('touchstart', t => {});
+  target.addEventListener('touchmove', t => {});
+  target.addEventListener('touchend', t => {});
+
+  // Post-Processing
   const composer = new EffectComposer(Renderer);
-
   const bloom = new UnrealBloomPass(
     new THREE.Vector2(), 
     /* Strength */0.369, 
@@ -209,35 +231,10 @@ window.addEventListener('DOMContentLoaded', () => {
   composer.addPass(afterImage);
   composer.addPass(smaa);
 
-  // Touch & Click recognition
-  const mInteractron_Edge = new THREE.MeshBasicMaterial();
-  const mInteractron_Core = new THREE.MeshBasicMaterial();
-  const gInteractron_Edge = new THREE.TorusGeometry();
-  const gInteractron_Core = new THREE.CircleGeometry();
-
-  const Interactron = new THREE.Group();
-  const interactronEdge = new THREE.Mesh(gInteractron_Edge, mInteractron_Edge);
-  const interactronCore = new THREE.Mesh(gInteractron_Core, mInteractron_Core);
-  Interactron.add(interactronEdge, interactronCore).visible = false;
-  Scene.add(Interactron);
-
-  // Capture pointer events
-  target.addEventListener('pointerup', p => {
-    Interactron.visible = false;
-  });
-  target.addEventListener('pointerdown', p => {
-    Interactron.visible = true;
-  });
-  target.addEventListener('pointermove', p => {});
-
-  // Capture touch events
-  target.addEventListener('touchstart', t => {});
-  target.addEventListener('touchmove', t => {});
-  target.addEventListener('touchend', t => {});
-
-  // Action!
+  // Render loop
   const render = () => {
     requestAnimationFrame(render);
+    Camera.updateProjectionMatrix();
     onAnimate.forEach(cb => cb());
     composer.render();
   };
