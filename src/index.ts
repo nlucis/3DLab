@@ -30,7 +30,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
   // controls...
   const controls = new ArcballControls(Camera, target, Scene);
-  // controls.setGizmosVisible(false);
+  controls.setGizmosVisible(false);
   controls.camera = Camera;
   controls.setTbRadius(0.3);
   controls.radiusFactor = 120;
@@ -40,7 +40,7 @@ window.addEventListener('DOMContentLoaded', () => {
   const gIRIS = new THREE.TorusGeometry(12, 1, 64, 64);
   const mIRIS = new THREE.MeshPhysicalMaterial({
     name: 'IRIS',
-    opacity: 0.72,
+    opacity: 0.64,
     color: 0xFFECEE,
     transparent: true,
 
@@ -54,17 +54,25 @@ window.addEventListener('DOMContentLoaded', () => {
     thickness: 20,
   });
   const IRIS = new THREE.Mesh(gIRIS, mIRIS);
+  const gOculum_Disc = new THREE.SphereGeometry(0.6);
   const gOculum_Cone = new THREE.ConeGeometry(0.6, 1, 4);
   const gOculum_Ring = new THREE.TorusGeometry(1, 0.12);
-  const mOculum = new THREE.MeshBasicMaterial({ color: 0xFF0000 });
+  const mOculum = new THREE.MeshBasicMaterial({ color: 0xFF0000, transparent: true, opacity: 0.36 });
+  // const mOcDisc = new THREE.MeshBasicMaterial({ color: 0x22ACFF, transparent: true, opacity: 0.36 });
+  // const oculumDisc = new THREE.Mesh(gOculum_Disc, mOcDisc);
   const oculumCone = new THREE.Mesh(gOculum_Cone, mOculum);
   const oculumRing = new THREE.Mesh(gOculum_Ring, mOculum);
 
-  oculumCone.position.y = 0.3;
+  oculumCone.position.y = +0.3;
+  // oculumDisc.position.y = -0.6;
+  // oculumDisc.scale.set(1, 0.3, 1);
 
-  const Oculum = new THREE.Group().add(oculumCone, oculumRing);
+  const Oculum = new THREE.Group().add(
+    oculumCone, 
+    oculumRing, 
+    // oculumDisc
+  );
   Oculum.rotation.z = THREE.MathUtils.degToRad(180);
-  onAnimate.push(() => Oculum.lookAt(Camera.position));
   Scene.add(Oculum);
 
   // Alpha & Omega arms
