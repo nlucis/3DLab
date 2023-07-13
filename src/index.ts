@@ -120,12 +120,12 @@ window.addEventListener('DOMContentLoaded', () => {
   });
 
   // Simulate vox flashing
-  let opacityMax = 3.0;
-  let opacityMin = 0.3;
-  setInterval(() => {
-    mPoints.opacity = THREE.MathUtils.randFloat(opacityMin, opacityMax);
-    mPoints.size = THREE.MathUtils.randFloat(0.3, 0.6);
-  }, 64);
+  // let opacityMax = 3.0;
+  // let opacityMin = 0.3;
+  // setInterval(() => {
+  //   mPoints.opacity = THREE.MathUtils.randFloat(opacityMin, opacityMax);
+  //   mPoints.size = THREE.MathUtils.randFloat(0.3, 0.6);
+  // }, 64);
 
   const GridPoints = new THREE.Points(gPoints, mPoints);
   onAnimate.push(() => {
@@ -135,6 +135,7 @@ window.addEventListener('DOMContentLoaded', () => {
   });
   Scene.add(GridPoints);
 
+  GridPoints.scale.set(0.4, 0.4, 0.4);
 
   // Centroid - Selection ring that an interactible aligns with to be slid off the orbital and into a slot stack
   // Slot Stacks - where interactibles are sorted and ordered in a vertical linear fashion, or discarded
@@ -320,9 +321,8 @@ window.addEventListener('DOMContentLoaded', () => {
   composer.addPass(new TAARenderPass(Scene, Camera, 0xFFFFFF, 0.01));
   composer.addPass(new TexturePass(overlayTex, 0.99 /* must be a value less than 1 or the TAA pass wont show */));
   composer.addPass(bloom);
-  composer.addPass(afterImage);
-  // adding a film pass because who says it can't be a little pretty?
   composer.addPass(scan);
+  composer.addPass(afterImage);
   composer.addPass(smaa);
 
   // Render loop
