@@ -76,11 +76,14 @@ window.addEventListener('DOMContentLoaded', () => {
   Scene.add(oculumCore, oculumEdge);
 
   // Alpha & Omega arms
-  const gArms = new THREE.CapsuleGeometry(0.3, 16);
+  const gArms = new THREE.CapsuleGeometry(0.12, 16);
   const mArms = new THREE.MeshPhysicalMaterial({
     color: 0xFF6C11,
-    emissive: 0xFFAC00,
+    // emissive: 0xFF6C33,
+    emissive: 0x72FF6C,
     emissiveIntensity: 0.64,
+    transparent: true,
+    opacity: 0.64
   });
   const AlphaArm = new THREE.Mesh(gArms, mArms);
   const OmegaArm = new THREE.Mesh(gArms, mArms);
@@ -310,11 +313,18 @@ window.addEventListener('DOMContentLoaded', () => {
   );
   const afterImage = new AfterimagePass(0.72);
   const smaa = new SMAAPass(window.innerWidth, window.innerHeight);
+  const scan = new FilmPass(
+    0.12,
+    0.72,
+    window.innerHeight * 2.0,
+    0
+  );
   composer.addPass(new TAARenderPass(Scene, Camera, 0xFFFFFF, 0.01));
   composer.addPass(new TexturePass(overlayTex, 0.99 /* must be a value less than 1 or the TAA pass wont show */));
   composer.addPass(bloom);
   composer.addPass(afterImage);
-  // film pass
+  // adding a film pass because who says it can't be a little pretty?
+  composer.addPass(scan);
   composer.addPass(smaa);
 
   // Render loop
