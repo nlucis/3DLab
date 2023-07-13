@@ -1,6 +1,9 @@
 lockfileVersion: 5.4
 
 specifiers:
+  '@pixi/assets': ^7.2.4
+  '@pixi/core': ^7.2.4
+  '@pixi/utils': ^7.2.4
   '@types/three': ^0.152.1
   cesium: ^1.107.0
   pixi.js: ^7.2.4
@@ -9,9 +12,12 @@ specifiers:
   vite: ^4.3.9
 
 dependencies:
+  '@pixi/assets': 7.2.4_g6kcrvjte5opnujtwgun74ym6y
+  '@pixi/core': 7.2.4
+  '@pixi/utils': 7.2.4
   '@types/three': 0.152.1
   cesium: 1.107.0
-  pixi.js: 7.2.4
+  pixi.js: 7.2.4_@pixi+utils@7.2.4
   three: 0.154.0
   typescript: 5.1.6
   vite: 4.3.9
@@ -270,13 +276,14 @@ packages:
       '@pixi/display': 7.2.4_@pixi+core@7.2.4
     dev: false
 
-  /@pixi/assets/7.2.4_@pixi+core@7.2.4:
+  /@pixi/assets/7.2.4_g6kcrvjte5opnujtwgun74ym6y:
     resolution: {integrity: sha512-7199re3wvMAlVqXLaCyAr8IkJSXqkeVAxcYyB2rBu4Id5m2hhlGX1dQsdMBiCXLwu6/LLVqDvJggSNVQBzL6ZQ==}
     peerDependencies:
       '@pixi/core': 7.2.4
       '@pixi/utils': 7.2.4
     dependencies:
       '@pixi/core': 7.2.4
+      '@pixi/utils': 7.2.4
       '@types/css-font-loading-module': 0.0.7
     dev: false
 
@@ -292,7 +299,7 @@ packages:
       '@pixi/assets': 7.2.4
       '@pixi/core': 7.2.4
     dependencies:
-      '@pixi/assets': 7.2.4_@pixi+core@7.2.4
+      '@pixi/assets': 7.2.4_g6kcrvjte5opnujtwgun74ym6y
       '@pixi/core': 7.2.4
     dev: false
 
@@ -534,7 +541,7 @@ packages:
       '@pixi/assets': 7.2.4
       '@pixi/core': 7.2.4
     dependencies:
-      '@pixi/assets': 7.2.4_@pixi+core@7.2.4
+      '@pixi/assets': 7.2.4_g6kcrvjte5opnujtwgun74ym6y
       '@pixi/core': 7.2.4
     dev: false
 
@@ -547,7 +554,7 @@ packages:
       '@pixi/mesh': 7.2.4
       '@pixi/text': 7.2.4
     dependencies:
-      '@pixi/assets': 7.2.4_@pixi+core@7.2.4
+      '@pixi/assets': 7.2.4_g6kcrvjte5opnujtwgun74ym6y
       '@pixi/core': 7.2.4
       '@pixi/display': 7.2.4_@pixi+core@7.2.4
       '@pixi/mesh': 7.2.4_itsaoqwq56fcz2brnb773dvv24
@@ -867,12 +874,12 @@ packages:
     resolution: {integrity: sha512-1fygroTLlHu66zi26VoTDv8yRgm0Fccecssto+MhsZ0D/DGW2sm8E8AjW7NU5VVTRt5GxbeZ5qBuJr+HyLYkjQ==}
     dev: false
 
-  /pixi.js/7.2.4:
+  /pixi.js/7.2.4_@pixi+utils@7.2.4:
     resolution: {integrity: sha512-nBH60meoLnHxoMFz17HoMxXS4uJpG5jwIdL+Gx2S11TzWgP3iKF+/WLOTrkSdyuQoQSdIBxVqpnYii0Wiox15A==}
     dependencies:
       '@pixi/accessibility': 7.2.4_apmmhdndg7szcc4swgeztfmmb4
       '@pixi/app': 7.2.4_itsaoqwq56fcz2brnb773dvv24
-      '@pixi/assets': 7.2.4_@pixi+core@7.2.4
+      '@pixi/assets': 7.2.4_g6kcrvjte5opnujtwgun74ym6y
       '@pixi/compressed-textures': 7.2.4_aghqcd5tse5cazfsjow2c4mnti
       '@pixi/core': 7.2.4
       '@pixi/display': 7.2.4_@pixi+core@7.2.4

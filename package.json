@@ -12,6 +12,9 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@pixi/assets": "^7.2.4",
+    "@pixi/core": "^7.2.4",
+    "@pixi/utils": "^7.2.4",
     "@types/three": "^0.152.1",
     "cesium": "^1.107.0",
     "pixi.js": "^7.2.4",
