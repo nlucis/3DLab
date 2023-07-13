@@ -13,6 +13,7 @@
   "license": "ISC",
   "dependencies": {
     "@types/three": "^0.152.1",
+    "cesium": "^1.107.0",
     "pixi.js": "^7.2.4",
     "three": "^0.154.0",
     "typescript": "^5.1.6",

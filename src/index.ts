@@ -228,6 +228,8 @@ window.addEventListener('DOMContentLoaded', () => {
   const updateCursor   = (mouse: MouseEvent) => { Cursor.set(mouse.clientX, mouse.clientY)};
   window.onmousemove   = updateCursor;
   window.onpointermove = updateCursor;
+  target.oncontextmenu = () => {Scene.background = new THREE.Color(0xFF00FF)};
+  
 
   let showText = false;
   const textToggle = new PIXI.Circle(cx, cy, 16);
@@ -241,7 +243,12 @@ window.addEventListener('DOMContentLoaded', () => {
     align: 'right',
     fontFamily: 'monospace',
     fontSize: '12pt',
-    fill: '#FFFFFF'
+    fill: '#FFFFFF',
+    dropShadow: true,
+    dropShadowDistance: 0,
+    dropShadowAlpha: 1,
+    dropShadowBlur: 2,
+    dropShadowColor: '#000000'
   });
   overlay.stage.addChild(
     coordDebug,
