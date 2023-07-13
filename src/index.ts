@@ -64,7 +64,7 @@ window.addEventListener('DOMContentLoaded', () => {
   const gOculum_Edge = new THREE.BoxGeometry(1.3, 1.3, 1.3, 3, 3, 3);
   const gOculum_Core = new THREE.BoxGeometry(0.6, 0.6, 0.6, 3, 3, 3);
   const mOculum_Edge = new THREE.MeshBasicMaterial({ color: 0x00ACFF, transparent: true, opacity: 0.72, side: THREE.BackSide });
-  const mOculum_Core = new THREE.MeshBasicMaterial({ color: 0xFFAC00, transparent: true, opacity: 0.72, side: THREE.DoubleSide });
+  const mOculum_Core = new THREE.MeshBasicMaterial({ color: 0x000000, transparent: true, opacity: 0.72, side: THREE.DoubleSide });
   const oculumEdge = new THREE.Mesh(gOculum_Edge, mOculum_Edge);
   const oculumCore = new THREE.Mesh(gOculum_Core, mOculum_Core);
 
@@ -235,7 +235,27 @@ window.addEventListener('DOMContentLoaded', () => {
     console.debug(`toggle ${showText && 'on' || 'off'} text overlay`);
     showText = !showText;
   };
+
+  const coordDebug = new PIXI.Graphics();
+  overlay.stage.addChild(coordDebug);
+
   onAnimate.push(() => {
+
+    const testIblePos = new THREE.Vector3(
+      TestInteractible.position.x, 
+      TestInteractible.position.y, 
+      TestInteractible.position.z
+    )
+    .project(Camera)
+
+    const projected2D = new THREE.Vector2(testIblePos.x * (window.innerWidth / 2)+cx, (-testIblePos.y * (window.innerHeight / 2)+cy));
+    coordDebug
+      .clear()
+      .lineStyle(3, 0xFF0000)
+      .drawCircle(projected2D.x, projected2D.y, 24)
+
+    // Test the coordinate converter
+    console.debug(projected2D);
 
     // Reset cursor position when pointer leaves the window
     !inFocus && Cursor.set(cx, cy);
