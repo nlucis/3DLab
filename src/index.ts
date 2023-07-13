@@ -1,7 +1,6 @@
 // import * as Cesium from 'cesium';
 import * as THREE from 'three';
 import * as PIXI from 'pixi.js';
-import * as Cesium from 'cesium';
 import { SMAAPass } from 'three/examples/jsm/postprocessing/SMAAPass';
 import { FilmPass } from 'three/examples/jsm/postprocessing/FilmPass';
 import { TexturePass } from 'three/examples/jsm/postprocessing/TexturePass';
@@ -23,7 +22,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
   // Lights..., 
   Renderer = new THREE.WebGLRenderer({ canvas: target, alpha: true, antialias: true });
-  Renderer.setClearAlpha(1);
+  Renderer.setClearAlpha(0);
 
   Renderer.setPixelRatio(window.devicePixelRatio);
   Renderer.setSize(window.innerWidth, window.innerHeight);
@@ -71,13 +70,10 @@ window.addEventListener('DOMContentLoaded', () => {
   const mOculum_Core = new THREE.MeshBasicMaterial({ color: 0x000000, transparent: true, opacity: 0.72, side: THREE.DoubleSide });
   const oculumEdge = new THREE.Mesh(gOculum_Edge, mOculum_Edge);
   const oculumCore = new THREE.Mesh(gOculum_Core, mOculum_Core);
-
-  // const Oculum = new InteractiveGroup(Renderer, Camera).add(oculumEdge, oculumCore);
-  // Oculum.rotation.z = THREE.MathUtils.degToRad(180);
   Scene.add(oculumCore, oculumEdge);
 
   // Alpha & Omega arms
-  const gArms = new THREE.CapsuleGeometry(0.12, 16);
+  const gArms = new THREE.CapsuleGeometry(0.06, 15);
   const mArms = new THREE.MeshPhysicalMaterial({
     color: 0xFF6C11,
     // emissive: 0xFF6C33,
@@ -86,8 +82,9 @@ window.addEventListener('DOMContentLoaded', () => {
     transparent: true,
     opacity: 0.64
   });
-  const AlphaArm = new THREE.Mesh(gArms, mArms);
-  const OmegaArm = new THREE.Mesh(gArms, mArms);
+  const mRays = new THREE.MeshBasicMaterial();
+  const AlphaArm = new THREE.Mesh(gArms, mRays);
+  const OmegaArm = new THREE.Mesh(gArms, mRays);
   OmegaArm.position.set(0, -16 - 6, 0);
   AlphaArm.position.set(0, +16 + 6, 0);
 
@@ -123,12 +120,12 @@ window.addEventListener('DOMContentLoaded', () => {
   });
 
   // Simulate vox flashing
-  // let opacityMax = 3.0;
-  // let opacityMin = 0.3;
-  // setInterval(() => {
-  //   mPoints.opacity = THREE.MathUtils.randFloat(opacityMin, opacityMax);
-  //   mPoints.size = THREE.MathUtils.randFloat(0.3, 0.6);
-  // }, 64);
+  let opacityMax = 3.0;
+  let opacityMin = 0.3;
+  setInterval(() => {
+    mPoints.opacity = THREE.MathUtils.randFloat(opacityMin, opacityMax);
+    mPoints.size = THREE.MathUtils.randFloat(0.3, 0.6);
+  }, 64);
 
   const GridPoints = new THREE.Points(gPoints, mPoints);
   onAnimate.push(() => {
@@ -314,18 +311,18 @@ window.addEventListener('DOMContentLoaded', () => {
   );
   const afterImage = new AfterimagePass(0.72);
   const smaa = new SMAAPass(window.innerWidth, window.innerHeight);
-  // const scan = new FilmPass(
-  //   0.12,
-  //   0.72,
-  //   window.innerHeight * 2.0,
-  //   0
-  // );
+  const scan = new FilmPass(
+    0.12,
+    0.72,
+    window.innerHeight * 2.0,
+    0
+  );
   composer.addPass(new TAARenderPass(Scene, Camera, 0xFFFFFF, 0.01));
   composer.addPass(new TexturePass(overlayTex, 0.99 /* must be a value less than 1 or the TAA pass wont show */));
   composer.addPass(bloom);
   composer.addPass(afterImage);
   // adding a film pass because who says it can't be a little pretty?
-  // composer.addPass(scan);
+  composer.addPass(scan);
   composer.addPass(smaa);
 
   // Render loop
