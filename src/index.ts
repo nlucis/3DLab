@@ -1,3 +1,4 @@
+// import * as Cesium from 'cesium';
 import * as THREE from 'three';
 import * as PIXI from 'pixi.js';
 import { SMAAPass } from 'three/examples/jsm/postprocessing/SMAAPass';
@@ -31,7 +32,6 @@ window.addEventListener('DOMContentLoaded', () => {
   // camera...
   Camera = new THREE.PerspectiveCamera(35, window.innerWidth / window.innerHeight, 1e-1, 1e+3);
   Camera.position.set(0, 0, -100);
-  // Scene.background = new THREE.Color(0.024, 0.012, 0.024);
 
   // controls...
   const controls = new ArcballControls(Camera, target, Scene);
