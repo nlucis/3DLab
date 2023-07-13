@@ -1,6 +1,7 @@
 // import * as Cesium from 'cesium';
 import * as THREE from 'three';
 import * as PIXI from 'pixi.js';
+import * as Cesium from 'cesium';
 import { SMAAPass } from 'three/examples/jsm/postprocessing/SMAAPass';
 import { FilmPass } from 'three/examples/jsm/postprocessing/FilmPass';
 import { TexturePass } from 'three/examples/jsm/postprocessing/TexturePass';
@@ -313,18 +314,18 @@ window.addEventListener('DOMContentLoaded', () => {
   );
   const afterImage = new AfterimagePass(0.72);
   const smaa = new SMAAPass(window.innerWidth, window.innerHeight);
-  const scan = new FilmPass(
-    0.12,
-    0.72,
-    window.innerHeight * 2.0,
-    0
-  );
+  // const scan = new FilmPass(
+  //   0.12,
+  //   0.72,
+  //   window.innerHeight * 2.0,
+  //   0
+  // );
   composer.addPass(new TAARenderPass(Scene, Camera, 0xFFFFFF, 0.01));
   composer.addPass(new TexturePass(overlayTex, 0.99 /* must be a value less than 1 or the TAA pass wont show */));
   composer.addPass(bloom);
   composer.addPass(afterImage);
   // adding a film pass because who says it can't be a little pretty?
-  composer.addPass(scan);
+  // composer.addPass(scan);
   composer.addPass(smaa);
 
   // Render loop

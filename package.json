@@ -8,11 +8,18 @@
     "https": "vite --host --https && tslint --exclude ./node_modules",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": ["three.js", "pixi.js", "Cesium JS", "nLucis", "Life Assistant"],
+  "keywords": [
+    "three.js",
+    "pixi.js",
+    "Cesium JS",
+    "nLucis",
+    "Life Assistant"
+  ],
   "author": "nLucis Creative | Arjay Jones",
   "license": "Copyright",
   "dependencies": {
     "@types/three": "^0.152.1",
+    "cesium": "^1.107.0",
     "pixi.js": "^7.2.4",
     "three": "^0.154.0",
     "typescript": "^5.1.6",
