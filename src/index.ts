@@ -237,25 +237,39 @@ window.addEventListener('DOMContentLoaded', () => {
   };
 
   const coordDebug = new PIXI.Graphics();
-  overlay.stage.addChild(coordDebug);
+  const debugLabel = new PIXI.Text('Test Interactible', {
+    align: 'right',
+    fontFamily: 'monospace',
+    fontSize: '12pt',
+    fill: '#FFFFFF'
+  });
+  overlay.stage.addChild(
+    coordDebug,
+    debugLabel
+  );
 
   onAnimate.push(() => {
 
+    // convert coordinates
     const testIblePos = new THREE.Vector3(
       TestInteractible.position.x, 
       TestInteractible.position.y, 
       TestInteractible.position.z
     )
     .project(Camera)
-
     const projected2D = new THREE.Vector2(testIblePos.x * (window.innerWidth / 2)+cx, (-testIblePos.y * (window.innerHeight / 2)+cy));
+    // Test the coordinate conversion
     coordDebug
       .clear()
-      .lineStyle(3, 0xFF0000)
+      .lineStyle(1, 0xFF0000)
       .drawCircle(projected2D.x, projected2D.y, 24)
-
-    // Test the coordinate converter
-    console.debug(projected2D);
+      .beginFill(0xFF0000)
+      .lineStyle(0, 0)
+      .drawCircle(projected2D.x, projected2D.y, 6)
+      .endFill()
+    ;
+    debugLabel.x = projected2D.x + (debugLabel.width * 0.2);
+    debugLabel.y = projected2D.y - (debugLabel.height * 0.5);
 
     // Reset cursor position when pointer leaves the window
     !inFocus && Cursor.set(cx, cy);
