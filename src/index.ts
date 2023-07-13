@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import * as PIXI from 'pixi.js';
 import { SMAAPass } from 'three/examples/jsm/postprocessing/SMAAPass';
+import { FilmPass } from 'three/examples/jsm/postprocessing/FilmPass';
 import { TexturePass } from 'three/examples/jsm/postprocessing/TexturePass';
 import { TAARenderPass } from 'three/examples/jsm/postprocessing/TAARenderPass';
 import {UnrealBloomPass} from 'three/examples/jsm/postprocessing/UnrealBloomPass';
@@ -18,8 +19,10 @@ export const onAnimate: {(): void}[] = [];
 window.addEventListener('DOMContentLoaded', () => {
   const target = document.getElementById('target') as HTMLCanvasElement;
 
-  // Lights...
-  Renderer = new THREE.WebGLRenderer({ canvas: target, alpha: false, antialias: true });
+  // Lights..., 
+  Renderer = new THREE.WebGLRenderer({ canvas: target, alpha: true, antialias: true });
+  Renderer.setClearAlpha(1);
+
   Renderer.setPixelRatio(window.devicePixelRatio);
   Renderer.setSize(window.innerWidth, window.innerHeight);
   Renderer.toneMapping = THREE.CineonToneMapping;
@@ -28,7 +31,7 @@ window.addEventListener('DOMContentLoaded', () => {
   // camera...
   Camera = new THREE.PerspectiveCamera(35, window.innerWidth / window.innerHeight, 1e-1, 1e+3);
   Camera.position.set(0, 0, -100);
-  Scene.background = new THREE.Color(0.024, 0.012, 0.024);
+  // Scene.background = new THREE.Color(0.024, 0.012, 0.024);
 
   // controls...
   const controls = new ArcballControls(Camera, target, Scene);
@@ -307,10 +310,11 @@ window.addEventListener('DOMContentLoaded', () => {
   );
   const afterImage = new AfterimagePass(0.72);
   const smaa = new SMAAPass(window.innerWidth, window.innerHeight);
-  composer.addPass(new TAARenderPass(Scene, Camera, 0xFFFFFF, 0.9));
-  composer.addPass(new TexturePass(overlayTex, 0.9 /* must be a value less than 1 or the TAA pass wont show */));
+  composer.addPass(new TAARenderPass(Scene, Camera, 0xFFFFFF, 0.01));
+  composer.addPass(new TexturePass(overlayTex, 0.99 /* must be a value less than 1 or the TAA pass wont show */));
   composer.addPass(bloom);
   composer.addPass(afterImage);
+  // film pass
   composer.addPass(smaa);
 
   // Render loop
