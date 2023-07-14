@@ -18,10 +18,12 @@
   "author": "nLucis Creative | Arjay Jones",
   "license": "Copyright",
   "dependencies": {
-    "@types/three": "^0.152.1",
-    "leaflet": "^1.9.4",
-    "pixi.js": "^7.2.4",
+    "cesium": "^1.107.2",
+    "@cesium/engine": "^3.0.1",
+    "@cesium/widgets": "^3.0.1",
     "three": "^0.154.0",
+    "@types/three": "^0.152.1",
+    "pixi.js": "^7.2.4",
     "typescript": "^5.1.6",
     "vite": "^4.3.9"
   }
