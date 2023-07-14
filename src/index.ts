@@ -62,10 +62,11 @@ window.addEventListener('DOMContentLoaded', () => {
   const gIRIS = new THREE.TorusGeometry(11, 1, 64, 64);
   const mIRIS = new THREE.MeshBasicMaterial({
     name: 'IRIS',
-    opacity: 0.64,
-    color: 0xFFECEE,
+    opacity: 1.2,
+    color: 0xFEECEE,
     transparent: true,
     side: THREE.DoubleSide,
+    dithering: true
   });
   
   const IRIS = new THREE.Mesh(gIRIS, mIRIS);
