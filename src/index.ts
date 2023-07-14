@@ -76,8 +76,8 @@ window.addEventListener('DOMContentLoaded', () => {
   const gArms = new THREE.CapsuleGeometry(0.06, 15);
   const mArms = new THREE.MeshPhysicalMaterial({
     color: 0xFF6C11,
-    // emissive: 0xFF6C33,
-    emissive: 0x72FF6C,
+    emissive: 0xFF6C33,
+    // emissive: 0x72FF6C,
     emissiveIntensity: 0.64,
     transparent: true,
     opacity: 0.64
@@ -273,9 +273,9 @@ window.addEventListener('DOMContentLoaded', () => {
     // Test the coordinate conversion
     coordDebug
       .clear()
-      .lineStyle(1, 0xFF0000)
-      .drawCircle(projected2D.x, projected2D.y, 24)
-      .beginFill(0xFF0000)
+      .lineStyle(2, 0xFF6C11)
+      .drawCircle(projected2D.x, projected2D.y, 12)
+      .beginFill(0xFFFFFF)
       .lineStyle(0, 0)
       .drawCircle(projected2D.x, projected2D.y, 6)
       .endFill()
