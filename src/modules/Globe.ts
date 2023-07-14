@@ -7,7 +7,20 @@ Cesium.Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOi
 // #1
 export default function InitGlobe() {
   const globeContainer = document.getElementById('somata') as HTMLDivElement;
-  const viewer = new Cesium.Viewer(globeContainer);
+  const viewer = new Cesium.CesiumWidget(globeContainer, {
+    skyAtmosphere: new Cesium.SkyAtmosphere(),
+    // skyBox: new Cesium.SkyBox(),
+    creditContainer: document.getElementById('no-show') as HTMLDivElement
+    // animation: false,
+    // infoBox: false,
+    // vrButton: false,
+    // homeButton: false,
+    // fullscreenButton: true,
+    // useDefaultRenderLoop: false,
+    // navigationHelpButton: false,
+    // navigationInstructionsInitiallyVisible: false,
+    // shadows: true,
+  });
 
   // Chain to #2
   init3D();
