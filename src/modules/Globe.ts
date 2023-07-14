@@ -10,5 +10,5 @@ export default function InitGlobe() {
   const viewer = new Cesium.Viewer(globeContainer);
 
   // Chain to #2
-  // init3D();
+  init3D();
 }
