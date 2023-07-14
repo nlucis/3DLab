@@ -51,7 +51,7 @@ export default function init3D() {
     emissive: 0xFF6C33,
     emissiveIntensity: 0.64,
     transparent: true,
-    opacity: 0.64
+    opacity: 1
   });
   const mRays = new THREE.MeshBasicMaterial();
   const AlphaArm = new THREE.Mesh(gArms, mRays);
@@ -282,6 +282,9 @@ export default function init3D() {
   overlay.stage.addChild(Interactron);
   const overlayTex = new THREE.CanvasTexture(overlay.view as OffscreenCanvas);
 
+  // Convert the Cesium globe canvas to a texture for layering as well
+  const cesiumTex = new THREE.CanvasTexture(window['globeCanvas']);
+
   // Post-Processing
   const composer = new EffectComposer(Renderer);
   const bloom = new UnrealBloomPass(
@@ -299,7 +302,9 @@ export default function init3D() {
     0
   );
   composer.addPass(new TAARenderPass(Scene, Camera, 0xFFFFFF, 0.01));
-  composer.addPass(new TexturePass(overlayTex, 0.99 /* must be a value less than 1 or the TAA pass wont show */));
+  /* alphas must be a value less than 1 or the TAA pass wont show */
+  composer.addPass(new TexturePass(cesiumTex, 0.64));
+  composer.addPass(new TexturePass(overlayTex, 0.99));
   composer.addPass(bloom);
   composer.addPass(scan);
   composer.addPass(afterImage);
@@ -308,9 +313,12 @@ export default function init3D() {
   // Render loop
   const render = () => {
     requestAnimationFrame(render);
-    Camera.updateProjectionMatrix();
-    overlayTex.needsUpdate = true;
     onAnimate.forEach(cb => cb());
+
+    cesiumTex.needsUpdate = true;
+    overlayTex.needsUpdate = true;
+
+    Camera.updateProjectionMatrix();
     overlay.render();
     composer.render();
   };

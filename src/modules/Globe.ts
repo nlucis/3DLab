@@ -7,7 +7,7 @@ Cesium.Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOi
 // #1
 export default function InitGlobe() {
   const globeContainer = document.getElementById('somata') as HTMLDivElement;
-  const viewer = new Cesium.CesiumWidget(globeContainer, {
+  const globe = new Cesium.CesiumWidget(globeContainer, {
     skyAtmosphere: new Cesium.SkyAtmosphere(),
     // skyBox: new Cesium.SkyBox(),
     creditContainer: document.getElementById('no-show') as HTMLDivElement
@@ -21,7 +21,10 @@ export default function InitGlobe() {
     // navigationInstructionsInitiallyVisible: false,
     // shadows: true,
   });
+  window['globeCanvas'] = globe.canvas;
 
   // Chain to #2
   init3D();
+
+  globe.camera.rotate(new Cesium.Cartesian3(0, 1, 0), 1);
 }
