@@ -44,7 +44,7 @@ window.addEventListener('DOMContentLoaded', () => {
   controls.enableRotate = true;
 
     // Alpha & Omega arms
-  const gArms = new THREE.CapsuleGeometry(0.06, 15);
+  const gArms = new THREE.CapsuleGeometry(0.24, 12);
   const mArms = new THREE.MeshPhysicalMaterial({
     color: 0xFF6C11,
     emissive: 0xFF6C33,
@@ -131,13 +131,10 @@ window.addEventListener('DOMContentLoaded', () => {
   const TestInteractible = new THREE.Group();
   const gTestInteract_Inner = new THREE.CircleGeometry(0.6, 64);
   const gTestInteract_Outer = new THREE.RingGeometry(0.9, 1.3, 64, 64);
-  const mInteractible = new THREE.MeshPhysicalMaterial({
+  const mInteractible = new THREE.MeshBasicMaterial({
     color: 0xFFFFFF,
-    emissive: 0xFFFFFF,
-    emissiveIntensity: 9,
     transparent: true,
-    opacity: 1.2,
-    transmission: 0.369
+    opacity: 0.64,
   });
   const gInteractBG = new THREE.CircleGeometry(1.6 + 0.3, 64);
   const mInteractBG = new THREE.MeshBasicMaterial({ color: 0x000000 });
@@ -254,7 +251,7 @@ window.addEventListener('DOMContentLoaded', () => {
     // Test the coordinate conversion
     coordDebug
       .clear()
-      .lineStyle(3, 0xFF6C11)
+      .lineStyle(3, 0xFF3211)
       .drawCircle(projected2D.x, projected2D.y, 9)
       .beginFill(0xFFFFFF)
       .lineStyle(0, 0)
