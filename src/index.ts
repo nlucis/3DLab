@@ -21,13 +21,10 @@ window.addEventListener('DOMContentLoaded', () => {
   const target = document.getElementById('target') as HTMLCanvasElement;
 
   // Lights..., 
-  Renderer = new THREE.WebGLRenderer({ canvas: target, alpha: true, antialias: true });
-  Renderer.setClearAlpha(0);
-
+  Renderer = new THREE.WebGLRenderer({ canvas: target, alpha: true, antialias: true, depth: true });
   Renderer.setPixelRatio(window.devicePixelRatio);
   Renderer.setSize(window.innerWidth, window.innerHeight);
-  Renderer.toneMapping = THREE.CineonToneMapping;
-  Renderer.toneMappingExposure = 1.36;
+  Renderer.setClearAlpha(0);
 
   // camera...
   Camera = new THREE.PerspectiveCamera(35, window.innerWidth / window.innerHeight, 1e-1, 1e+3);
@@ -46,38 +43,11 @@ window.addEventListener('DOMContentLoaded', () => {
   controls.enableZoom = false;
   controls.enableRotate = true;
 
-  // IRIS Ring
-  const gIRIS = new THREE.TorusGeometry(12, 1, 64, 64);
-  const mIRIS = new THREE.MeshPhysicalMaterial({
-    name: 'IRIS',
-    opacity: 0.64,
-    color: 0xFFECEE,
-    transparent: true,
-
-    emissive: 0xFFFFFF,
-    emissiveIntensity: 0.24,
-
-    clearcoat: 1,
-    clearcoatRoughness: 0.72,
-    transmission: 0.36,
-    side: THREE.DoubleSide,
-    thickness: 20,
-  });
-  const IRIS = new THREE.Mesh(gIRIS, mIRIS);
-  const gOculum_Edge = new THREE.BoxGeometry(1.3, 1.3, 1.3, 3, 3, 3);
-  const gOculum_Core = new THREE.BoxGeometry(0.6, 0.6, 0.6, 3, 3, 3);
-  const mOculum_Edge = new THREE.MeshBasicMaterial({ color: 0x00ACFF, transparent: true, opacity: 0.72, side: THREE.BackSide });
-  const mOculum_Core = new THREE.MeshBasicMaterial({ color: 0x000000, transparent: true, opacity: 0.72, side: THREE.DoubleSide });
-  const oculumEdge = new THREE.Mesh(gOculum_Edge, mOculum_Edge);
-  const oculumCore = new THREE.Mesh(gOculum_Core, mOculum_Core);
-  Scene.add(oculumCore, oculumEdge);
-
-  // Alpha & Omega arms
+    // Alpha & Omega arms
   const gArms = new THREE.CapsuleGeometry(0.06, 15);
   const mArms = new THREE.MeshPhysicalMaterial({
     color: 0xFF6C11,
     emissive: 0xFF6C33,
-    // emissive: 0x72FF6C,
     emissiveIntensity: 0.64,
     transparent: true,
     opacity: 0.64
@@ -88,11 +58,22 @@ window.addEventListener('DOMContentLoaded', () => {
   OmegaArm.position.set(0, -16 - 6, 0);
   AlphaArm.position.set(0, +16 + 6, 0);
 
+  // IRIS Ring
+  const gIRIS = new THREE.TorusGeometry(11, 1, 64, 64);
+  const mIRIS = new THREE.MeshBasicMaterial({
+    name: 'IRIS',
+    opacity: 0.64,
+    color: 0xFFECEE,
+    transparent: true,
+    side: THREE.DoubleSide,
+  });
+  
+  const IRIS = new THREE.Mesh(gIRIS, mIRIS);
 
     // Visualizer ring for the orbital zone | overlaps with the centroid UI
-  let r = 14.2;
+  let r = 12;
   let w = 0.6;
-  const gOrbitalZone = new THREE.RingGeometry(r - w, r, 64, 64);
+  const gOrbitalZone = new THREE.RingGeometry(12.3, 12.7, 64, 64);
   const OrbitalZone = new THREE.Mesh(gOrbitalZone, mArms);
 
   const staticOrbit = new THREE.Group();
@@ -113,9 +94,9 @@ window.addEventListener('DOMContentLoaded', () => {
   const gPoints = new THREE.IcosahedronGeometry(9, 12);
   const mPoints = new THREE.PointsMaterial({
     name: 'point-sphere',
-    color: 0x7C7C7C,
+    color: 0xFFFFFF,
     size: 0.1,
-    opacity: 0.6,
+    opacity: 1.0,
     blending: THREE.AdditiveBlending,
   });
 
@@ -273,8 +254,8 @@ window.addEventListener('DOMContentLoaded', () => {
     // Test the coordinate conversion
     coordDebug
       .clear()
-      .lineStyle(2, 0xFF6C11)
-      .drawCircle(projected2D.x, projected2D.y, 12)
+      .lineStyle(3, 0xFF6C11)
+      .drawCircle(projected2D.x, projected2D.y, 9)
       .beginFill(0xFFFFFF)
       .lineStyle(0, 0)
       .drawCircle(projected2D.x, projected2D.y, 6)
