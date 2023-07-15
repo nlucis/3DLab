@@ -1,6 +1,6 @@
 // import * as Cesium from 'cesium';
 
-import InitGlobe from "./modules/Globe";
+import InitGlobe from "./modules/Space";
 
 export const onAnimate: {(): void}[] = [];
 
