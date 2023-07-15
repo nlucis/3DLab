@@ -26,11 +26,21 @@ export default function InitGlobe() {
   if (!getGlobeInit()) {
     const globeContainer = document.getElementById('somata') as HTMLDivElement;
     const globe = new Cesium.Viewer(globeContainer, {
+      contextOptions: {
+        webgl: {
+          alpha: true,
+          antialias: true,
+          depth: true,
+        }
+      },
       shadows: false,
+      skyBox: false,
       scene3DOnly: true,
       skyAtmosphere: false,
       creditViewport: 'no-show',
       creditContainer: document.getElementById('no-show') as HTMLDivElement,
+
+      terrain: Cesium.Terrain.fromWorldTerrain(),
 
       // Viewer specific clutter elements
       infoBox: false,
@@ -46,6 +56,7 @@ export default function InitGlobe() {
       navigationHelpButton: false,
       navigationInstructionsInitiallyVisible: false,
     });
+    Cesium.createOsmBuildingsAsync().then(tileset => globe.scene.primitives.add(tileset));
     
 
     // Bind underlying canvas for reference by three.js
@@ -65,9 +76,10 @@ export default function InitGlobe() {
         right: globe.camera.right,
       }
     };
+    globe.scene.backgroundColor = new Cesium.Color(0, 0, 0, 0);
 
-    globe.trackedEntity
-    console.debug(globe);
+    // globe.trackedEntity
+
     setInterval(() => {
 
       const upAxisVector = new THREE.Vector3(
@@ -102,21 +114,27 @@ export default function InitGlobe() {
     const g_testBall = new THREE.SphereGeometry();
     const m_testBall = new THREE.MeshBasicMaterial();
     const o_testBall = new THREE.Mesh(g_testBall, m_testBall);
+
     output.add(o_testBall);
     
     const threeToCesium = new GLTFExporter();
-    threeToCesium.parse(o_testBall, 
-      GLTF => {
-        console.debug(GLTF)
-        globe.entities.add({
-          name: 'test',
-          model: {
-            // uri: GLTF
-          }
-        });
-      }, 
-      error => console.error(error)
-    );
+    const exportGLTF = threeToCesium.parseAsync(o_testBall, {
+      trs: true,
+      binary: false /* return as .glb instead of .gltf? */,
+      animations: [],
+      embedImages: true,
+      onlyVisible: true,
+    });
+    exportGLTF.then(model => {
+      console.debug(model);
+      const test = globe.entities.add({
+        name: 'test',
+        model: {
+          uri: model.toString()
+        }
+      });
+      globe.trackedEntity = test;
+    });
 
     globe.scene.sunBloom = true;
   }
@@ -182,7 +200,6 @@ const InitHardwareSensors = (cesium: CesiumType.CesiumWidget | CesiumType.Viewer
     geo.watchPosition(
 
       (geoData) => {
-        console.debug(geoData);
         SpatialData.geolocation.latitude = geoData.coords.latitude;
         SpatialData.geolocation.longitude = geoData.coords.longitude;
         SpatialData.geolocation.altitude = geoData.coords.altitude;
