@@ -1,33 +1,124 @@
+// dependencies
 import * as THREE from "three";
-import { getGlobeInit, onAnimate, setGlobeInit } from "..";
-import init3D, { Camera } from "./Init3D";
+import { 
+  GLTFExporter, 
+  GLTFExporterOptions 
+} from 'three/examples/jsm/exporters/GLTFExporter';
 import * as CesiumType from 'cesium';
 
+// modules
+import init3D, { 
+  Camera 
+} from "./Init3D";
+import { 
+  onAnimate, 
+  getGlobeInit, 
+  setGlobeInit, 
+} from "..";
+
+// configs
 const Cesium: typeof CesiumType = window['Cesium'];
 Cesium.Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiJhZDM0OTQ5Yi1lYjQ1LTRkMjQtYjllMC00YjkzOWNkZmIzMDYiLCJpZCI6ODIyOTgsImlhdCI6MTY4OTIxODI0MX0.5o0xQ4T4BCI8afp_0lXzjO_wa0kTOkc7dCdCGnJDiro';
+
 
 // #1
 export default function InitGlobe() {
   if (!getGlobeInit()) {
     const globeContainer = document.getElementById('somata') as HTMLDivElement;
-    const globe = new Cesium.CesiumWidget(globeContainer, {
+    const globe = new Cesium.Viewer(globeContainer, {
       shadows: false,
       scene3DOnly: true,
       skyAtmosphere: false,
       creditViewport: 'no-show',
       creditContainer: document.getElementById('no-show') as HTMLDivElement,
+
+      // Viewer specific clutter elements
+      infoBox: false,
+      vrButton: false,
+      timeline: false,
+      geocoder: false,
+      animation: false,
+      homeButton: false,
+      sceneModePicker: false,
+      baseLayerPicker: false,
+      fullscreenButton: false,
+      selectionIndicator: false,
+      navigationHelpButton: false,
+      navigationInstructionsInitiallyVisible: false,
     });
-    InitHardwareSensors(globe);
+    
 
     // Bind underlying canvas for reference by three.js
     window['globeCanvas'] = globe.canvas;
 
-    // Chain to #2
     setGlobeInit(true);
+    InitHardwareSensors(globe);
+
+    const ObserverTelemetry = {
+      roll: globe.camera.roll,
+      pitch: globe.camera.pitch,
+      heading: globe.camera.heading,
+      position: globe.camera.position,
+      direction: globe.camera.direction,
+      reference: {
+        up: globe.camera.up,
+        right: globe.camera.right,
+      }
+    };
+
+    globe.trackedEntity
+    console.debug(globe);
+    setInterval(() => {
+
+      const upAxisVector = new THREE.Vector3(
+        Cesium.Math.toDegrees(globe.camera.up.x),
+        Cesium.Math.toDegrees(globe.camera.up.y),
+        Cesium.Math.toDegrees(globe.camera.up.z),
+      );
+      const rightAxisVector = new THREE.Vector3(
+        Cesium.Math.toDegrees(globe.camera.right.x),
+        Cesium.Math.toDegrees(globe.camera.right.y),
+        Cesium.Math.toDegrees(globe.camera.right.z),
+      );
+      const forwardVector = new THREE.Vector3(
+        Cesium.Math.toDegrees(globe.camera.direction.x),
+        Cesium.Math.toDegrees(globe.camera.direction.y),
+        Cesium.Math.toDegrees(globe.camera.direction.z),
+      );
+      
+      // console.debug(
+      //   `\nUp Axis Vector:`,    upAxisVector,
+      //   `\nRight Axis Vector:`, rightAxisVector,
+      //   `\nForward Vector:`,    forwardVector
+      // );
+      }, 1000);
+
+    // Chain to #2
     // init3D();
 
     // use three.js to dynamically generate meshes, export them to gltf, and then load them into Cesium
     // Three's camera, scene, and renderer may not even be needed for it
+    const output = new THREE.Scene();
+    const g_testBall = new THREE.SphereGeometry();
+    const m_testBall = new THREE.MeshBasicMaterial();
+    const o_testBall = new THREE.Mesh(g_testBall, m_testBall);
+    output.add(o_testBall);
+    
+    const threeToCesium = new GLTFExporter();
+    threeToCesium.parse(o_testBall, 
+      GLTF => {
+        console.debug(GLTF)
+        globe.entities.add({
+          name: 'test',
+          model: {
+            // uri: GLTF
+          }
+        });
+      }, 
+      error => console.error(error)
+    );
+
+    globe.scene.sunBloom = true;
   }
 }
 
@@ -90,7 +181,6 @@ const InitHardwareSensors = (cesium: CesiumType.CesiumWidget | CesiumType.Viewer
     const geo = navigator.geolocation;
     geo.watchPosition(
 
-      /* normal operation */ 
       (geoData) => {
         console.debug(geoData);
         SpatialData.geolocation.latitude = geoData.coords.latitude;
@@ -103,7 +193,6 @@ const InitHardwareSensors = (cesium: CesiumType.CesiumWidget | CesiumType.Viewer
         SpatialData.geolocation.groundSpeed = geoData.coords.speed;
       },
 
-      /* error handler */
       (error) => {
         console.error(error);
       },
