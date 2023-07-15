@@ -22,25 +22,32 @@ Cesium.Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOi
 
 
 // #1
-export default function InitGlobe() {
+export default function Initgeomap() {
+
+  Cesium.Model
+  Cesium.Primitive
+  Cesium.Entity
+
   if (!getGlobeInit()) {
-    const globeContainer = document.getElementById('somata') as HTMLDivElement;
-    const globe = new Cesium.Viewer(globeContainer, {
+    const cesiumContainer = document.getElementById('somata') as HTMLDivElement;
+    const geomap = new Cesium.Viewer(cesiumContainer, {
       contextOptions: {
         webgl: {
-          alpha: true,
-          antialias: true,
-          depth: true,
-        }
+          alpha: false,
+          antialias: false,
+        },
       },
-      shadows: false,
+      msaaSamples: 0,
       skyBox: false,
+      shadows: false,
       scene3DOnly: true,
       skyAtmosphere: false,
-      creditViewport: 'no-show',
-      creditContainer: document.getElementById('no-show') as HTMLDivElement,
+      sceneMode: Cesium.SceneMode.SCENE3D,
+      creditContainer: document.getElementById('no-show') as HTMLDivElement, // will be displayed on load and in console instead
 
       terrain: Cesium.Terrain.fromWorldTerrain(),
+      targetFrameRate: 24,
+      shouldAnimate: false,
 
       // Viewer specific clutter elements
       infoBox: false,
@@ -56,46 +63,55 @@ export default function InitGlobe() {
       navigationHelpButton: false,
       navigationInstructionsInitiallyVisible: false,
     });
-    Cesium.createOsmBuildingsAsync().then(tileset => globe.scene.primitives.add(tileset));
+
+    // Generate buildings
+    Cesium.createOsmBuildingsAsync().then(tileset => geomap.scene.primitives.add(tileset));
+
+    console.debug(geomap.camera.getMagnitude());
+    geomap.camera.getPickRay
+    geomap.camera.getPixelSize
+    geomap.camera
     
+    // Swap the rendering canvas to an offscreen instance
+    geomap.scene.canvas.style.opacity = '0';
 
     // Bind underlying canvas for reference by three.js
-    window['globeCanvas'] = globe.canvas;
+    window['geomapCanvas'] = geomap.canvas;
 
     setGlobeInit(true);
-    InitHardwareSensors(globe);
+    InitHardwareSensors(geomap);
 
     const ObserverTelemetry = {
-      roll: globe.camera.roll,
-      pitch: globe.camera.pitch,
-      heading: globe.camera.heading,
-      position: globe.camera.position,
-      direction: globe.camera.direction,
+      roll: geomap.camera.roll,
+      pitch: geomap.camera.pitch,
+      heading: geomap.camera.heading,
+      position: geomap.camera.position,
+      direction: geomap.camera.direction,
       reference: {
-        up: globe.camera.up,
-        right: globe.camera.right,
+        up: geomap.camera.up,
+        right: geomap.camera.right,
       }
     };
-    globe.scene.backgroundColor = new Cesium.Color(0, 0, 0, 0);
+    geomap.scene.backgroundColor = new Cesium.Color(0, 0, 0, 0);
 
-    // globe.trackedEntity
+    // geomap.trackedEntity
 
     setInterval(() => {
 
       const upAxisVector = new THREE.Vector3(
-        Cesium.Math.toDegrees(globe.camera.up.x),
-        Cesium.Math.toDegrees(globe.camera.up.y),
-        Cesium.Math.toDegrees(globe.camera.up.z),
+        Cesium.Math.toDegrees(geomap.camera.up.x),
+        Cesium.Math.toDegrees(geomap.camera.up.y),
+        Cesium.Math.toDegrees(geomap.camera.up.z),
       );
       const rightAxisVector = new THREE.Vector3(
-        Cesium.Math.toDegrees(globe.camera.right.x),
-        Cesium.Math.toDegrees(globe.camera.right.y),
-        Cesium.Math.toDegrees(globe.camera.right.z),
+        Cesium.Math.toDegrees(geomap.camera.right.x),
+        Cesium.Math.toDegrees(geomap.camera.right.y),
+        Cesium.Math.toDegrees(geomap.camera.right.z),
       );
       const forwardVector = new THREE.Vector3(
-        Cesium.Math.toDegrees(globe.camera.direction.x),
-        Cesium.Math.toDegrees(globe.camera.direction.y),
-        Cesium.Math.toDegrees(globe.camera.direction.z),
+        Cesium.Math.toDegrees(geomap.camera.direction.x),
+        Cesium.Math.toDegrees(geomap.camera.direction.y),
+        Cesium.Math.toDegrees(geomap.camera.direction.z),
       );
       
       // console.debug(
@@ -105,8 +121,11 @@ export default function InitGlobe() {
       // );
       }, 1000);
 
+      // Cleanup the Cesium bloat
+      document.getElementById('no-show')?.childNodes.forEach(childNode => childNode.remove());
+
     // Chain to #2
-    // init3D();
+    init3D();
 
     // use three.js to dynamically generate meshes, export them to gltf, and then load them into Cesium
     // Three's camera, scene, and renderer may not even be needed for it
@@ -118,25 +137,35 @@ export default function InitGlobe() {
     output.add(o_testBall);
     
     const threeToCesium = new GLTFExporter();
-    const exportGLTF = threeToCesium.parseAsync(o_testBall, {
+    const exportGLTF = threeToCesium.parse(o_testBall, 
+    data => {
+      // console.debug(data['buffers'][0]['uri']);
+      const getTestModel = Cesium.Model.fromGltfAsync({
+        url: data,
+        show: true,
+        allowPicking: true,
+        asynchronous: true,
+        backFaceCulling: true,
+      });
+
+      getTestModel.then(model => {
+
+        const testget = geomap.entities.getOrCreateEntity('test');
+        testget.model = model;
+        geomap.trackedEntity = testget;
+        // geomap.flyTo(testget)
+      });
+    }, 
+    err => console.error(err), 
+    {
       trs: true,
       binary: false /* return as .glb instead of .gltf? */,
       animations: [],
       embedImages: true,
       onlyVisible: true,
     });
-    exportGLTF.then(model => {
-      console.debug(model);
-      const test = globe.entities.add({
-        name: 'test',
-        model: {
-          uri: model.toString()
-        }
-      });
-      globe.trackedEntity = test;
-    });
 
-    globe.scene.sunBloom = true;
+    geomap.scene.sunBloom = true;
   }
 }
 

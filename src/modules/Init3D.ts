@@ -22,13 +22,12 @@ export default function init3D() {
   const target = document.getElementById('target') as HTMLCanvasElement;
 
   // Lights..., 
-  Renderer = new THREE.WebGLRenderer({ canvas: target, alpha: true, antialias: true, depth: true });
-  Renderer.setPixelRatio(window.devicePixelRatio);
+  Renderer = new THREE.WebGLRenderer({ canvas: target, alpha: true });
   Renderer.setSize(window.innerWidth, window.innerHeight);
+  // Renderer.setPixelRatio(window.devicePixelRatio);
   // Renderer.toneMapping = THREE.ACESFilmicToneMapping;
   // Renderer.toneMappingExposure = 3;
-  Renderer.setClearAlpha(0);
-  Renderer.setClearColor(0x000000)
+  Renderer.setClearColor(0x000000, 0)
 
   // camera...
   Camera = new THREE.PerspectiveCamera(35, window.innerWidth / window.innerHeight, 1e-1, 1e+3);
@@ -96,7 +95,7 @@ export default function init3D() {
   Scene.add(IRIS, staticOrbit);
 
   // Info Sphere - Point Grid
-  const gPoints = new THREE.IcosahedronGeometry(9, 12);
+  const gPoints = new THREE.IcosahedronGeometry(1400, 36);
   const mPoints = new THREE.PointsMaterial({
     name: 'point-sphere',
     color: 0xFFFFFF,
@@ -115,13 +114,15 @@ export default function init3D() {
 
   const GridPoints = new THREE.Points(gPoints, mPoints);
   onAnimate.push(() => {
-    GridPoints.rotation.x += 0.006;
+    // GridPoints.rotation.x += 0.006;
     GridPoints.rotation.y -= 0.003;
-    GridPoints.rotation.z += 0.009;
+    // GridPoints.rotation.z += 0.009;
   });
+
+  GridPoints.position.set(Camera.position.x, Camera.position.y, Camera.position.z);
   Scene.add(GridPoints);
 
-  GridPoints.scale.set(0.4, 0.4, 0.4);
+  // GridPoints.scale.set(0.4, 0.4, 0.4);
 
   // Centroid - Selection ring that an interactible aligns with to be slid off the orbital and into a slot stack
   // Slot Stacks - where interactibles are sorted and ordered in a vertical linear fashion, or discarded
@@ -163,7 +164,7 @@ export default function init3D() {
     TestInteractible.position.set(vecCoords[posID].x, vecCoords[posID].y, vecCoords[posID].z);
     TestInteractible.lookAt(Camera.position);
   });
-  Scene.add(TestInteractible);
+  // Scene.add(TestInteractible);
 
   // Backdrop hemisphere
   const gBackdrop = new THREE.SphereGeometry(13.5, 64, 64);
@@ -175,17 +176,17 @@ export default function init3D() {
   });
 
   const Backdrop = new THREE.Mesh(gBackdrop, mBackdrop);
-  Scene.add(Backdrop);
+  // Scene.add(Backdrop);
 
   // const overlayTex = new THREE.CanvasTexture(overlay.view as OffscreenCanvas);
 
   // Convert the Cesium globe canvas to a texture for layering as well
-  const cesiumTex = new THREE.CanvasTexture(window['globeCanvas']);
+  const cesiumTex = new THREE.CanvasTexture(window['geomapCanvas']);
 
   // Post-Processing
   const composer = new EffectComposer(Renderer);
   const bloom = new UnrealBloomPass(
-    new THREE.Vector2(), 
+    new THREE.Vector2(1000, 1000), 
     /* Strength */0.369, 
     /* Radius   */0.222, 
     /* Threshold*/0.012
@@ -200,16 +201,16 @@ export default function init3D() {
   );
 
   /* NOTE: clear alphas must be a value less than 1 or the TAA pass wont show */
-  composer.addPass(new TAARenderPass(Scene, Camera, 0x000000, 0.3));
+  composer.addPass(new TAARenderPass(Scene, Camera, 0x000000, 1.0));
   composer.addPass(new TexturePass(cesiumTex, 0.36));
   // composer.addPass(new TexturePass(overlayTex, 0.99));
   composer.addPass(bloom);
-  composer.addPass(scan);
-  composer.addPass(afterImage);
+  // composer.addPass(scan);
+  // composer.addPass(afterImage);
   composer.addPass(smaa);
 
   onAnimate.push(() => {
-    Camera.updateProjectionMatrix();
+    // Camera.updateProjectionMatrix();
 
     cesiumTex.needsUpdate = true;
     // overlayTex.needsUpdate = true;
@@ -217,7 +218,6 @@ export default function init3D() {
     // overlay.render();
     composer.render();
   });
-
 
   // Chain #4
   initUI();
