@@ -1,4 +1,6 @@
-import init3D from "./Init3D";
+import * as THREE from "three";
+import { getGlobeInit, onAnimate, setGlobeInit } from "..";
+import init3D, { Camera } from "./Init3D";
 import * as CesiumType from 'cesium';
 
 const Cesium: typeof CesiumType = window['Cesium'];
@@ -6,25 +8,49 @@ Cesium.Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOi
 
 // #1
 export default function InitGlobe() {
-  const globeContainer = document.getElementById('somata') as HTMLDivElement;
-  const globe = new Cesium.CesiumWidget(globeContainer, {
-    skyAtmosphere: new Cesium.SkyAtmosphere(),
-    // skyBox: new Cesium.SkyBox(),
-    creditContainer: document.getElementById('no-show') as HTMLDivElement
-    // animation: false,
-    // infoBox: false,
-    // vrButton: false,
-    // homeButton: false,
-    // fullscreenButton: true,
-    // useDefaultRenderLoop: false,
-    // navigationHelpButton: false,
-    // navigationInstructionsInitiallyVisible: false,
-    // shadows: true,
-  });
-  window['globeCanvas'] = globe.canvas;
+  if (!getGlobeInit()) {
+    const globeContainer = document.getElementById('somata') as HTMLDivElement;
+    const globe = new Cesium.CesiumWidget(globeContainer, {
+      shadows: false,
+      scene3DOnly: true,
+      skyAtmosphere: false,
+      creditViewport: 'no-show',
+      creditContainer: document.getElementById('no-show') as HTMLDivElement,
+    });
+    InitGeolocation(globe);
 
-  // Chain to #2
-  init3D();
+    // Bind underlying canvas for reference by three.js
+    window['globeCanvas'] = globe.canvas;
 
-  globe.camera.rotate(new Cesium.Cartesian3(0, 1, 0), 1);
+    // Chain to #2
+    setGlobeInit(true);
+    // init3D();
+
+    // use three.js to dynamically generate meshes, export them to gltf, and then load them into Cesium
+    // Three's camera, scene, and renderer may not even be needed for it
+  }
+}
+
+const InitGeolocation = (cesium: CesiumType.CesiumWidget | CesiumType.Viewer) => {
+  if ('navigator' in window) {
+    const geo = navigator.geolocation;
+    geo.watchPosition(
+      /* normal operation */ 
+      (geoData) => {
+        console.debug(geoData);
+        cesium.camera.flyTo({
+          destination: Cesium.Cartesian3.fromDegrees(geoData.coords.longitude, geoData.coords.latitude, 120)
+        });
+      },
+      /* error handler */
+      (error) => {
+        console.error(error);
+      },
+      {
+        // timeout: 3600,
+        // maximumAge: 1200,
+        enableHighAccuracy: true,
+      }
+    );
+  }
 }

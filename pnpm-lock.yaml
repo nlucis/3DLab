@@ -4,6 +4,7 @@ specifiers:
   '@cesium/engine': ^3.0.1
   '@cesium/widgets': ^3.0.1
   '@types/three': ^0.152.1
+  '@vitejs/plugin-basic-ssl': ^1.0.1
   cesium: ^1.107.2
   pixi.js: ^7.2.4
   three: ^0.154.0
@@ -14,6 +15,7 @@ dependencies:
   '@cesium/engine': 3.0.1
   '@cesium/widgets': 3.0.1
   '@types/three': 0.152.1
+  '@vitejs/plugin-basic-ssl': 1.0.1_vite@4.3.9
   cesium: 1.107.2
   pixi.js: 7.2.4
   three: 0.154.0
@@ -685,6 +687,15 @@ packages:
 
   /@types/webxr/0.5.2:
     resolution: {integrity: sha512-szL74BnIcok9m7QwYtVmQ+EdIKwbjPANudfuvDrAF8Cljg9MKUlIoc1w5tjj9PMpeSH3U1Xnx//czQybJ0EfSw==}
+    dev: false
+
+  /@vitejs/plugin-basic-ssl/1.0.1_vite@4.3.9:
+    resolution: {integrity: sha512-pcub+YbFtFhaGRTo1832FQHQSHvMrlb43974e2eS8EKleR3p1cDdkJFPci1UhwkEf1J9Bz+wKBSzqpKp7nNj2A==}
+    engines: {node: '>=14.6.0'}
+    peerDependencies:
+      vite: ^3.0.0 || ^4.0.0
+    dependencies:
+      vite: 4.3.9
     dev: false
 
   /@zip.js/zip.js/2.4.26:

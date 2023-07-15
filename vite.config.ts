@@ -1,15 +1,16 @@
 import { defineConfig } from 'vite';
+import basicSsl from '@vitejs/plugin-basic-ssl';
 
 export default defineConfig({
-  // server: { 
-  //   https: false,
-  //   port: 3001,
-  //   cors: true,
-  //   fs: {
-  //     allow: ['./dist', './src', './public', './models', './node_modules/'],
-  //   }
-  // },
-  
+  server: { 
+    https: true,
+    port: 3001,
+    cors: true,
+  },
+
+plugins: [
+  basicSsl()
+],
   build: {
     rollupOptions: {
       plugins: [],
