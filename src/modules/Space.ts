@@ -70,7 +70,22 @@ export default function Initgeomap() {
     console.debug(geomap.camera.getMagnitude());
     geomap.camera.getPickRay
     geomap.camera.getPixelSize
-    geomap.camera
+    geomap.camera.distanceToBoundingSphere
+    geomap.scene.cartesianToCanvasCoordinates
+    geomap.scene.globe.getHeight
+    geomap.scene.globe.material
+    geomap.scene.globe.tileLoadProgressEvent
+    geomap.scene.globe.translucency
+    geomap.scene.preRender
+
+    Cesium.EllipsoidSurfaceAppearance
+    geomap.scene.preUpdate
+    geomap.scene.postRender
+    geomap.scene.postUpdate
+
+    geomap.postProcessStages.add(
+      geomap.postProcessStages.ambientOcclusion 
+    )
     
     // Swap the rendering canvas to an offscreen instance
     geomap.scene.canvas.style.opacity = '0';
