@@ -49,7 +49,7 @@ export default function init3D() {
   const gPoints = new THREE.IcosahedronGeometry(2, 6);
   const mPoints = new THREE.PointsMaterial({
     name: 'point-sphere',
-    color: 0xFFAC00,
+    color: 0xEFAC70,
     size: 0.1,
     opacity: 1.0,
     blending: THREE.AdditiveBlending,
@@ -115,7 +115,7 @@ export default function init3D() {
   composer.addPass(new TexturePass(cesiumTex, 0.36));
   // composer.addPass(new TexturePass(overlayTex, 0.99));
   composer.addPass(bloom);
-  // composer.addPass(scan);
+  composer.addPass(scan);
   // composer.addPass(afterImage);
   composer.addPass(smaa);
 
