@@ -66,7 +66,6 @@ export default function init3D() {
   const gTetraBack = new THREE.CircleGeometry(5, 3);
   const mTetraBack = new THREE.MeshBasicMaterial({ 
     color: 0x2F5CA6,
-    // transparent: false,
     side: THREE.BackSide
   });
   const TetraBack = new THREE.Mesh(gTetraBack, mTetraBack);
@@ -85,8 +84,6 @@ export default function init3D() {
   // setInterval(() => {
   //   mPoints.opacity = THREE.MathUtils.randFloat(opacityMin, opacityMax);
   // }, 64);
-
-  // const overlayTex = new THREE.CanvasTexture(overlay.view as OffscreenCanvas);
 
   // Convert the Cesium globe canvas to a texture for layering as well
   const cesiumTex = new THREE.CanvasTexture(window['geomapCanvas']);
@@ -108,20 +105,14 @@ export default function init3D() {
   );
 
   /* NOTE: clear alphas must be a value less than 1 or the TAA pass wont show */
-  composer.addPass(new TAARenderPass(Scene, Camera, 0x1A1A19, 0.6));
+  composer.addPass(new TAARenderPass(Scene, Camera, 0x120A0E, 1.0));
   composer.addPass(new TexturePass(cesiumTex, 0.36));
-  // composer.addPass(new TexturePass(overlayTex, 0.99));
   composer.addPass(bloom);
   composer.addPass(scan);
   composer.addPass(smaa);
 
   onAnimate.push(() => {
-    // Camera.updateProjectionMatrix();
-
     cesiumTex.needsUpdate = true;
-    // overlayTex.needsUpdate = true;
-
-    // overlay.render();
     composer.render();
   });
 
