@@ -101,7 +101,6 @@ export default function init3D() {
     /* Radius   */0.222, 
     /* Threshold*/0.012
   );
-  const afterImage = new AfterimagePass(0.72);
   const smaa = new SMAAPass(window.innerWidth, window.innerHeight);
   const scan = new FilmPass(
     0.12,
@@ -116,7 +115,6 @@ export default function init3D() {
   // composer.addPass(new TexturePass(overlayTex, 0.99));
   composer.addPass(bloom);
   composer.addPass(scan);
-  // composer.addPass(afterImage);
   composer.addPass(smaa);
 
   onAnimate.push(() => {
