@@ -1,7 +1,7 @@
 {
-  "name": "three-lab",
+  "name": "tilli",
   "version": "1.0.0",
-  "description": "",
+  "description": "Telemetric Interlocutive Large-Language Interface",
   "main": "index.js",
   "scripts": {
     "http": "vite --host && tslint --exclude ./node_modules",

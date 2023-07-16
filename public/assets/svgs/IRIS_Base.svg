@@ -345,7 +345,7 @@
 </g>
 </g>
 </g>
-<path d="M195 48.4908L261.56 163.776L128.44 163.776L195 48.4908Z" fill="#282828" fill-rule="nonzero" filter="url(#Filter_14)" stroke="#ffac00" stroke-linecap="butt" stroke-linejoin="round" stroke-width="1.39802" vectornator:layerName="VisualizerWindow" vectornator:shadowAngle="-1.56298" vectornator:shadowColor="#000000" vectornator:shadowOffset="0" vectornator:shadowOpacity="1" vectornator:shadowRadius="9"/>
+<path d="M195 48.4908L261.56 163.776L128.44 163.776L195 48.4908Z" fill="none" filter="url(#Filter_14)" stroke="#ffac00" stroke-linecap="butt" stroke-linejoin="round" stroke-width="1.39802" vectornator:layerName="VisualizerWindow" vectornator:shadowAngle="-1.56298" vectornator:shadowColor="#000000" vectornator:shadowOffset="0" vectornator:shadowOpacity="1" vectornator:shadowRadius="9"/>
 </g>
 <g id="Dialer" vectornator:layerName="Dialer" visibility="hidden">
 <g filter="url(#Filter_15)" vectornator:layerName="Iris" vectornator:shadowAngle="-1.56298" vectornator:shadowColor="#000000" vectornator:shadowOffset="0" vectornator:shadowOpacity="0.790208" vectornator:shadowRadius="11.7125">

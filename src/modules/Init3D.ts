@@ -46,7 +46,7 @@ export default function init3D() {
   controls.enableRotate = true;
 
   // Info Sphere - Point Grid
-  const gPoints = new THREE.IcosahedronGeometry(1400, 36);
+  const gPoints = new THREE.IcosahedronGeometry(2.4, 9);
   const mPoints = new THREE.PointsMaterial({
     name: 'point-sphere',
     color: 0xFFFFFF,
@@ -60,17 +60,16 @@ export default function init3D() {
   // let opacityMin = 0.3;
   // setInterval(() => {
   //   mPoints.opacity = THREE.MathUtils.randFloat(opacityMin, opacityMax);
-  //   mPoints.size = THREE.MathUtils.randFloat(0.3, 0.6);
   // }, 64);
 
   const GridPoints = new THREE.Points(gPoints, mPoints);
   onAnimate.push(() => {
-    // GridPoints.rotation.x += 0.006;
+    GridPoints.rotation.x += 0.006;
     GridPoints.rotation.y -= 0.003;
-    // GridPoints.rotation.z += 0.009;
+    GridPoints.rotation.z += 0.009;
   });
 
-  GridPoints.position.set(Camera.position.x, Camera.position.y, Camera.position.z);
+  GridPoints.position.set(0, 22.2, 0);
   Scene.add(GridPoints);
 
   // GridPoints.scale.set(0.4, 0.4, 0.4);
