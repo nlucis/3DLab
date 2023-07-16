@@ -111,9 +111,14 @@ export default function init3D() {
   composer.addPass(scan);
   composer.addPass(smaa);
 
+  // Test rotating the rotary rotator (lol)
+  const rotaryDial = document.getElementById('ui-rotary-dial') as HTMLObjectElement;
+  let rotationAngle = 0;
   onAnimate.push(() => {
+    rotaryDial.style.rotate = `${rotationAngle}deg`;
     cesiumTex.needsUpdate = true;
     composer.render();
+    rotationAngle += 1;
   });
 
   // Chain #4
