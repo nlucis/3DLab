@@ -34,7 +34,7 @@ body {
   pointer-events: none;
   background-color: transparent;
 }
-#ui-rotary {
+#ui-rotary-zone, #ui-rotary-selector {
   position: absolute;
   top: 0;
   z-index: 3;
