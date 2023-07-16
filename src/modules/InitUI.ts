@@ -15,24 +15,20 @@ export default function initUI() {
   };
 
   /* Set toggling for static UI components */
-  // IRIS.Rotary.Zone.style.opacity = '0';
-  // IRIS.Rotary.Dial.style.opacity = '0';
-  // IRIS.Rotary.Selector.style.opacity = '0';
-
-  // The icon dial stays stationary, but the selector rotates around it to encode the selected mode based on angle
+  IRIS.Rotary.Zone.style.opacity = '0';
+  IRIS.Rotary.Dial.style.opacity = '0';
+  IRIS.Rotary.Selector.style.opacity = '0';
 
   /* Logic for moving UI components e.g. ... */ 
-  let angle = 0;
-  onAnimate.push(() => {
-    IRIS.Rotary.Selector.style.rotate = `${angle}deg`;
-    angle++;
-  });
-
-  // Using a Three.js circle geometry object with 6 segments, grabbing the vertex coord for each segment...
-
+  // The icon dial stays stationary, but the selector rotates around it to encode the selected mode based on angle
+  // let angle = 0;
+  // onAnimate.push(() => {
+  //   IRIS.Rotary.Selector.style.rotate = `${angle}deg`;
+  //   angle++;
+  // });
 
   // Uses HTML Overlays in Cesium to control location and scaling of datapoint tags
-
+  
   // Call Main() in SILVIC
   Main();
 }
