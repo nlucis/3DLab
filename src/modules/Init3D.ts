@@ -46,33 +46,47 @@ export default function init3D() {
   controls.enableRotate = true;
 
   // Info Sphere - Point Grid
-  const gPoints = new THREE.IcosahedronGeometry(2.4, 9);
+  const gPoints = new THREE.IcosahedronGeometry(2, 6);
   const mPoints = new THREE.PointsMaterial({
     name: 'point-sphere',
-    color: 0xFFFFFF,
+    color: 0xFFAC00,
     size: 0.1,
     opacity: 1.0,
     blending: THREE.AdditiveBlending,
   });
 
+
+  const Visualizer = new THREE.Points(gPoints, mPoints);
+  onAnimate.push(() => {
+    Visualizer.rotation.x += 0.006;
+    Visualizer.rotation.y -= 0.003;
+    Visualizer.rotation.z += 0.009;
+  });
+  Visualizer.position.set(0, 22.2, 0);
+
+  // Using a circle limited to 3 segments to create a 2D triangle
+  const gTetraBack = new THREE.CircleGeometry(5, 3);
+  const mTetraBack = new THREE.MeshBasicMaterial({ 
+    color: 0x2F5CA6,
+    // transparent: false,
+    side: THREE.BackSide
+  });
+  const TetraBack = new THREE.Mesh(gTetraBack, mTetraBack);
+
+  // Alignment with visualizer
+  TetraBack.rotation.z = THREE.MathUtils.degToRad(90);
+  TetraBack.position.set(Visualizer.position.x, Visualizer.position.y + 0.6, Visualizer.position.z + 3);
+
+  Scene.add(
+    Visualizer,
+    TetraBack
+  );
   // Simulate vox flashing
   // let opacityMax = 3.0;
   // let opacityMin = 0.3;
   // setInterval(() => {
   //   mPoints.opacity = THREE.MathUtils.randFloat(opacityMin, opacityMax);
   // }, 64);
-
-  const GridPoints = new THREE.Points(gPoints, mPoints);
-  onAnimate.push(() => {
-    GridPoints.rotation.x += 0.006;
-    GridPoints.rotation.y -= 0.003;
-    GridPoints.rotation.z += 0.009;
-  });
-
-  GridPoints.position.set(0, 22.2, 0);
-  Scene.add(GridPoints);
-
-  // GridPoints.scale.set(0.4, 0.4, 0.4);
 
   // const overlayTex = new THREE.CanvasTexture(overlay.view as OffscreenCanvas);
 
@@ -97,7 +111,7 @@ export default function init3D() {
   );
 
   /* NOTE: clear alphas must be a value less than 1 or the TAA pass wont show */
-  composer.addPass(new TAARenderPass(Scene, Camera, 0x000000, 1.0));
+  composer.addPass(new TAARenderPass(Scene, Camera, 0x1A1A19, 0.6));
   composer.addPass(new TexturePass(cesiumTex, 0.36));
   // composer.addPass(new TexturePass(overlayTex, 0.99));
   composer.addPass(bloom);
