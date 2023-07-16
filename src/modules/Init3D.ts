@@ -79,8 +79,8 @@ export default function init3D() {
     TetraBack
   );
   // Simulate vox flashing
-  // let opacityMax = 3.0;
-  // let opacityMin = 0.3;
+  // let opacityMax = 6.0;
+  // let opacityMin = 0.6;
   // setInterval(() => {
   //   mPoints.opacity = THREE.MathUtils.randFloat(opacityMin, opacityMax);
   // }, 64);
