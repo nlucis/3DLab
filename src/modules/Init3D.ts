@@ -23,10 +23,8 @@ export default function init3D() {
   // Lights..., 
   Renderer = new THREE.WebGLRenderer({ canvas: target, alpha: true });
   Renderer.setSize(window.innerWidth, window.innerHeight);
-  // Renderer.setPixelRatio(window.devicePixelRatio);
-  // Renderer.toneMapping = THREE.ACESFilmicToneMapping;
-  // Renderer.toneMappingExposure = 3;
-  Renderer.setClearColor(0x000000, 0)
+  Renderer.setPixelRatio(window.devicePixelRatio);
+  Renderer.toneMapping = THREE.CineonToneMapping;
 
   // camera...
   Camera = new THREE.PerspectiveCamera(35, window.innerWidth / window.innerHeight, 1e-1, 1e+3);
