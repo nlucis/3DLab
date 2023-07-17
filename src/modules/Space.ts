@@ -15,6 +15,7 @@ import {
   getGlobeInit, 
   setGlobeInit, 
 } from "..";
+import { Cesium3DTileStyle } from "@cesium/engine";
 
 // configs
 const Cesium: typeof CesiumType = window['Cesium'];
@@ -67,18 +68,17 @@ export default function Initgeomap() {
     // Generate buildings
     Cesium.createOsmBuildingsAsync({
     showOutline: false,
-    style: {
-      // backgroundEnabled: true
-    },
+
+    // @ts-ignore 
     customShader: new Cesium.CustomShader({
-      translucencyMode: 'TRANSLUCENT',
+      mode: Cesium.CustomShaderMode.REPLACE_MATERIAL,
+      
       lightingModel: Cesium.LightingModel.UNLIT,
       fragmentShaderText: `
         // Color tiles by distance to the camera
         void fragmentMain(FragmentInput fsInput, inout czm_modelMaterial material)
         {
-            material.diffuse = vec3(0.1, 0.1, 0.1);
-            material.diffuse.g = fsInput.attributes.positionEC.z / 1.0e4;
+            material.diffuse = vec3(0.1, 0.0, 0.1);
             material.diffuse.b = -fsInput.attributes.positionEC.z / 1.0e4;
         }
         `,
@@ -89,6 +89,8 @@ export default function Initgeomap() {
     // Add horizon sihouette
     const outliner = geomap.scene.postProcessStages.add(Cesium.PostProcessStageLibrary.createSilhouetteStage());
     outliner.uniforms.color = Cesium.Color.WHITE;
+    outliner.uniforms.length = 0.12;
+    console.debug(outliner.uniforms);
 
     console.debug(geomap.camera.getMagnitude());
     geomap.camera.getPickRay
