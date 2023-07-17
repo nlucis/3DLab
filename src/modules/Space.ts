@@ -65,7 +65,30 @@ export default function Initgeomap() {
     });
 
     // Generate buildings
-    Cesium.createOsmBuildingsAsync().then(tileset => geomap.scene.primitives.add(tileset));
+    Cesium.createOsmBuildingsAsync({
+    showOutline: false,
+    style: {
+      // backgroundEnabled: true
+    },
+    customShader: new Cesium.CustomShader({
+      translucencyMode: 'TRANSLUCENT',
+      lightingModel: Cesium.LightingModel.UNLIT,
+      fragmentShaderText: `
+        // Color tiles by distance to the camera
+        void fragmentMain(FragmentInput fsInput, inout czm_modelMaterial material)
+        {
+            material.diffuse = vec3(0.1, 0.1, 0.1);
+            material.diffuse.g = fsInput.attributes.positionEC.z / 1.0e4;
+            material.diffuse.b = -fsInput.attributes.positionEC.z / 1.0e4;
+        }
+        `,
+    }),
+})
+.then(tileset => geomap.scene.primitives.add(tileset));
+
+    // Add horizon sihouette
+    const outliner = geomap.scene.postProcessStages.add(Cesium.PostProcessStageLibrary.createSilhouetteStage());
+    outliner.uniforms.color = Cesium.Color.WHITE;
 
     console.debug(geomap.camera.getMagnitude());
     geomap.camera.getPickRay
