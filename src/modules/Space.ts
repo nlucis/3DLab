@@ -78,8 +78,10 @@ export default function Initgeomap() {
         // Color tiles by distance to the camera
         void fragmentMain(FragmentInput fsInput, inout czm_modelMaterial material)
         {
-            material.diffuse = vec3(0.1, 0.0, 0.1);
+            material.diffuse = vec3(0.1, 0.1, 0.3);
+            material.diffuse.g = +fsInput.attributes.positionEC.z / 1.0e4;
             material.diffuse.b = -fsInput.attributes.positionEC.z / 1.0e4;
+            material.diffuse.r = -fsInput.attributes.positionEC.y / 1.0e4;
         }
         `,
     }),
