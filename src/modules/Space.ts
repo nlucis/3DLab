@@ -16,6 +16,7 @@ import {
   setGlobeInit, 
 } from "..";
 import { Cesium3DTileStyle } from "@cesium/engine";
+import { onAnimate } from '../index';
 
 // configs
 const Cesium: typeof CesiumType = window['Cesium'];
@@ -40,7 +41,7 @@ export default function Initgeomap() {
       },
       msaaSamples: 0,
       skyBox: false,
-      shadows: false,
+      shadows: true,
       scene3DOnly: true,
       skyAtmosphere: false,
       sceneMode: Cesium.SceneMode.SCENE3D,
@@ -87,6 +88,46 @@ export default function Initgeomap() {
     }),
 })
 .then(tileset => geomap.scene.primitives.add(tileset));
+
+const g_testCube = new THREE.BoxGeometry(2, 2, 2);
+const m_testCube = new THREE.MeshBasicMaterial({ color: 0xFFAC00 });
+const o_testCube = new THREE.Mesh(g_testCube, m_testCube);
+const exporter = new GLTFExporter();
+exporter.parseAsync(o_testCube, {
+  animations: [],
+  binary: true,
+  embedImages: true,
+  forceIndices: false,
+  includeCustomExtensions: false,
+  maxTextureSize: Infinity,
+  onlyVisible: true,
+  trs: false,
+})
+.then(gltf => {
+  console.debug(gltf);
+  const blob = new Blob([ gltf as ArrayBuffer ], {
+    type: 'application/octet-stream'
+  });
+  const uri = URL.createObjectURL(blob);
+  Cesium.Model.fromGltfAsync({url: uri, modelMatrix: Cesium.Transforms.headingPitchRollToFixedFrame(
+    Cesium.Cartesian3.fromDegrees(
+      SpatialData.geolocation.longitude as number,
+      SpatialData.geolocation.latitude as number,
+      SpatialData.geolocation.altitude as number
+    ),
+    new Cesium.HeadingPitchRoll()
+  )})
+  .then(model => {
+    model.show = true;
+  model.backFaceCulling = true;
+  model.outlineColor = Cesium.Color.ORANGE;
+  model.silhouetteSize = 3;
+  model.silhouetteColor = Cesium.Color.ORANGE;
+
+    geomap.scene.primitives.add(model, 1);
+  });
+
+});
 
     // Add horizon sihouette
     const outliner = geomap.scene.postProcessStages.add(Cesium.PostProcessStageLibrary.createSilhouetteStage());
