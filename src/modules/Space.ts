@@ -17,6 +17,7 @@ import {
 } from "..";
 import { Cesium3DTileStyle } from "@cesium/engine";
 import { onAnimate } from '../index';
+import * as Cesium from 'cesium';
 
 // configs
 const Cesium: typeof CesiumType = window['Cesium'];
@@ -32,23 +33,12 @@ export default function Initgeomap() {
   if (!getGlobeInit()) {
     const cesiumContainer = document.getElementById('somata') as HTMLDivElement;
     const geomap = new Cesium.Viewer(cesiumContainer, {
-      contextOptions: {
-        webgl: {
-          alpha: false,
-          antialias: false,
-        },
-      },
       msaaSamples: 0,
-      skyBox: false,
-      shadows: true,
       scene3DOnly: true,
       skyAtmosphere: false,
       sceneMode: Cesium.SceneMode.SCENE3D,
       creditContainer: document.getElementById('no-show') as HTMLDivElement, // will be displayed on load and in console instead
-
-      terrain: Cesium.Terrain.fromWorldTerrain(),
-      targetFrameRate: 24,
-      shouldAnimate: false,
+      terrain: Cesium.Terrain.fromWorldTerrain({requestVertexNormals: true}),
 
       // Viewer specific clutter elements
       infoBox: false,
@@ -57,8 +47,6 @@ export default function Initgeomap() {
       geocoder: false,
       animation: false,
       homeButton: false,
-      sceneModePicker: false,
-      baseLayerPicker: false,
       fullscreenButton: false,
       selectionIndicator: false,
       navigationHelpButton: false,
@@ -67,7 +55,7 @@ export default function Initgeomap() {
 
     // Generate buildings
     Cesium.createOsmBuildingsAsync({
-    showOutline: false,
+    showOutline: true,
 
     // @ts-ignore 
     customShader: new Cesium.CustomShader({
@@ -87,11 +75,9 @@ export default function Initgeomap() {
     }),
 })
 .then(tileset => {
-  console.debug(tileset); 
   tileset.outlineColor = Cesium.Color.WHITE;
   geomap.scene.primitives.add(tileset);
 });
-
 
     // Add horizon sihouette
     const outliner = geomap.scene.postProcessStages.add(Cesium.PostProcessStageLibrary.createSilhouetteStage());
@@ -246,13 +232,14 @@ const InitHardwareSensors = (cesium: CesiumType.CesiumWidget | CesiumType.Viewer
           includeCustomExtensions: false,
           maxTextureSize: Infinity,
           onlyVisible: true,
-          trs: false,
+          trs: true,
         })
         
         .then(gltf => {
           const blob = new Blob([ gltf as ArrayBuffer ], {type: 'application/octet-stream'});
           const uri = URL.createObjectURL(blob);
-          const position = Cesium.Cartesian3.fromDegrees(geoData.coords.longitude, geoData.coords.latitude);
+          const position = Cesium.Cartesian3.fromDegrees(geoData.coords.longitude, geoData.coords.latitude, 1);
+          
           
           const moon = new Cesium.Moon();
           const sun = new Cesium.Sun();
@@ -262,19 +249,22 @@ const InitHardwareSensors = (cesium: CesiumType.CesiumWidget | CesiumType.Viewer
           cesium.scene.sun = sun;
 
             Cesium.Model.fromGltfAsync({
+              cull: true,
               url: uri, 
               allowPicking: true,
               scene: cesium.scene,
               upAxis: CesiumType.Axis.Y,
               forwardAxis: CesiumType.Axis.Z,
-              heightReference: Cesium.HeightReference.CLAMP_TO_GROUND,
+              enableShowOutline: true,
+              outlineColor: Cesium.Color.WHITE,
+              heightReference: Cesium.HeightReference.RELATIVE_TO_GROUND,
+              backFaceCulling: true,
               modelMatrix: Cesium.Transforms.headingPitchRollToFixedFrame(
                 position,
                 new Cesium.HeadingPitchRoll()
             )})
 
             .then(model => {
-              model.outlineColor = Cesium.Color.ORANGE;
               cesium.scene.primitives.add(model);
             });
             cesium.camera.flyTo({ destination: Cesium.Cartesian3.fromDegrees(geoData.coords.longitude, geoData.coords.latitude, 200)})
