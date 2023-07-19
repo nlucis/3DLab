@@ -86,27 +86,17 @@ export default function Initgeomap() {
         `,
     }),
 })
-.then(tileset => geomap.scene.primitives.add(tileset));
+.then(tileset => {
+  console.debug(tileset); 
+  tileset.outlineColor = Cesium.Color.WHITE;
+  geomap.scene.primitives.add(tileset);
+});
 
 
     // Add horizon sihouette
     const outliner = geomap.scene.postProcessStages.add(Cesium.PostProcessStageLibrary.createSilhouetteStage());
     outliner.uniforms.color = Cesium.Color.WHITE;
     outliner.uniforms.length = 0.12;
-    geomap.camera.getPickRay
-    geomap.camera.getPixelSize
-    geomap.camera.distanceToBoundingSphere
-    geomap.scene.cartesianToCanvasCoordinates
-    geomap.scene.globe.getHeight
-    geomap.scene.globe.material
-    geomap.scene.globe.tileLoadProgressEvent
-    geomap.scene.globe.translucency
-    geomap.scene.preRender
-
-    Cesium.EllipsoidSurfaceAppearance
-    geomap.scene.preUpdate
-    geomap.scene.postRender
-    geomap.scene.postUpdate
 
     // geomap.postProcessStages.add(
     //   geomap.postProcessStages.ambientOcclusion 
@@ -231,7 +221,7 @@ const InitHardwareSensors = (cesium: CesiumType.CesiumWidget | CesiumType.Viewer
 
     // GPS polling
     const geo = navigator.geolocation;
-    geo.watchPosition(
+    geo.getCurrentPosition(
 
       (geoData) => {
         SpatialData.geolocation.latitude = geoData.coords.latitude;
@@ -263,29 +253,31 @@ const InitHardwareSensors = (cesium: CesiumType.CesiumWidget | CesiumType.Viewer
           const blob = new Blob([ gltf as ArrayBuffer ], {type: 'application/octet-stream'});
           const uri = URL.createObjectURL(blob);
           const position = Cesium.Cartesian3.fromDegrees(geoData.coords.longitude, geoData.coords.latitude);
-          console.debug(cesium);
           
           const moon = new Cesium.Moon();
           const sun = new Cesium.Sun();
+          sun.glowFactor = 0.6;
           console.debug(moon, sun);
           cesium.scene.moon = moon;
           cesium.scene.sun = sun;
 
             Cesium.Model.fromGltfAsync({
               url: uri, 
-              heightReference: Cesium.HeightReference.RELATIVE_TO_GROUND,
+              allowPicking: true,
+              scene: cesium.scene,
+              upAxis: CesiumType.Axis.Y,
+              forwardAxis: CesiumType.Axis.Z,
+              heightReference: Cesium.HeightReference.CLAMP_TO_GROUND,
               modelMatrix: Cesium.Transforms.headingPitchRollToFixedFrame(
                 position,
                 new Cesium.HeadingPitchRoll()
             )})
 
             .then(model => {
-              model.show = true;
-              model.backFaceCulling = true;
               model.outlineColor = Cesium.Color.ORANGE;
               cesium.scene.primitives.add(model);
             });
-            cesium.camera.flyTo({ destination: position })
+            cesium.camera.flyTo({ destination: Cesium.Cartesian3.fromDegrees(geoData.coords.longitude, geoData.coords.latitude, 200)})
         });
       },
 
