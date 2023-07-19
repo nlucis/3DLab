@@ -299,3 +299,9 @@ const InitHardwareSensors = (cesium: CesiumType.CesiumWidget | CesiumType.Viewer
 
   // updateLocation();
 }
+
+// IndexDB - Save Local
+export const SaveLocal = () => {};
+
+// IPFS - Save Global
+export const SaveGlobal = () => {};
