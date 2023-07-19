@@ -55,12 +55,11 @@ export default function Initgeomap() {
 
     // Generate buildings
     Cesium.createOsmBuildingsAsync({
-    showOutline: true,
+    showOutline: false,
 
     // @ts-ignore 
     customShader: new Cesium.CustomShader({
       mode: Cesium.CustomShaderMode.REPLACE_MATERIAL,
-      
       lightingModel: Cesium.LightingModel.UNLIT,
       fragmentShaderText: `
         // Color tiles by distance to the camera
@@ -75,7 +74,6 @@ export default function Initgeomap() {
     }),
 })
 .then(tileset => {
-  tileset.outlineColor = Cesium.Color.WHITE;
   geomap.scene.primitives.add(tileset);
 });
 
@@ -84,9 +82,9 @@ export default function Initgeomap() {
     outliner.uniforms.color = Cesium.Color.WHITE;
     outliner.uniforms.length = 0.12;
 
-    // geomap.postProcessStages.add(
-    //   geomap.postProcessStages.ambientOcclusion 
-    // )
+    geomap.postProcessStages.add(
+      geomap.postProcessStages.ambientOcclusion 
+    )
     
     // Swap the rendering canvas to an offscreen instance
     geomap.scene.canvas.style.opacity = '0';
@@ -255,7 +253,7 @@ const InitHardwareSensors = (cesium: CesiumType.CesiumWidget | CesiumType.Viewer
               scene: cesium.scene,
               upAxis: CesiumType.Axis.Y,
               forwardAxis: CesiumType.Axis.Z,
-              enableShowOutline: true,
+              showOutline: true,
               outlineColor: Cesium.Color.WHITE,
               heightReference: Cesium.HeightReference.RELATIVE_TO_GROUND,
               backFaceCulling: true,
