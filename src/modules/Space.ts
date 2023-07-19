@@ -22,7 +22,6 @@ import { onAnimate } from '../index';
 const Cesium: typeof CesiumType = window['Cesium'];
 Cesium.Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiJhZDM0OTQ5Yi1lYjQ1LTRkMjQtYjllMC00YjkzOWNkZmIzMDYiLCJpZCI6ODIyOTgsImlhdCI6MTY4OTIxODI0MX0.5o0xQ4T4BCI8afp_0lXzjO_wa0kTOkc7dCdCGnJDiro';
 
-
 // #1
 export default function Initgeomap() {
 
@@ -89,53 +88,11 @@ export default function Initgeomap() {
 })
 .then(tileset => geomap.scene.primitives.add(tileset));
 
-const g_testCube = new THREE.BoxGeometry(2, 2, 2);
-const m_testCube = new THREE.MeshBasicMaterial({ color: 0xFFAC00 });
-const o_testCube = new THREE.Mesh(g_testCube, m_testCube);
-const exporter = new GLTFExporter();
-exporter.parseAsync(o_testCube, {
-  animations: [],
-  binary: true,
-  embedImages: true,
-  forceIndices: false,
-  includeCustomExtensions: false,
-  maxTextureSize: Infinity,
-  onlyVisible: true,
-  trs: false,
-})
-.then(gltf => {
-  console.debug(gltf);
-  const blob = new Blob([ gltf as ArrayBuffer ], {
-    type: 'application/octet-stream'
-  });
-  const uri = URL.createObjectURL(blob);
-  Cesium.Model.fromGltfAsync({url: uri, modelMatrix: Cesium.Transforms.headingPitchRollToFixedFrame(
-    Cesium.Cartesian3.fromDegrees(
-      SpatialData.geolocation.longitude as number,
-      SpatialData.geolocation.latitude as number,
-      SpatialData.geolocation.altitude as number
-    ),
-    new Cesium.HeadingPitchRoll()
-  )})
-  .then(model => {
-    model.show = true;
-  model.backFaceCulling = true;
-  model.outlineColor = Cesium.Color.ORANGE;
-  model.silhouetteSize = 3;
-  model.silhouetteColor = Cesium.Color.ORANGE;
-
-    geomap.scene.primitives.add(model, 1);
-  });
-
-});
 
     // Add horizon sihouette
     const outliner = geomap.scene.postProcessStages.add(Cesium.PostProcessStageLibrary.createSilhouetteStage());
     outliner.uniforms.color = Cesium.Color.WHITE;
     outliner.uniforms.length = 0.12;
-    console.debug(outliner.uniforms);
-
-    console.debug(geomap.camera.getMagnitude());
     geomap.camera.getPickRay
     geomap.camera.getPixelSize
     geomap.camera.distanceToBoundingSphere
@@ -151,9 +108,9 @@ exporter.parseAsync(o_testCube, {
     geomap.scene.postRender
     geomap.scene.postUpdate
 
-    geomap.postProcessStages.add(
-      geomap.postProcessStages.ambientOcclusion 
-    )
+    // geomap.postProcessStages.add(
+    //   geomap.postProcessStages.ambientOcclusion 
+    // )
     
     // Swap the rendering canvas to an offscreen instance
     geomap.scene.canvas.style.opacity = '0';
@@ -212,41 +169,6 @@ exporter.parseAsync(o_testCube, {
 
     // use three.js to dynamically generate meshes, export them to gltf, and then load them into Cesium
     // Three's camera, scene, and renderer may not even be needed for it
-    const output = new THREE.Scene();
-    const g_testBall = new THREE.SphereGeometry();
-    const m_testBall = new THREE.MeshBasicMaterial();
-    const o_testBall = new THREE.Mesh(g_testBall, m_testBall);
-
-    output.add(o_testBall);
-    
-    const threeToCesium = new GLTFExporter();
-    const exportGLTF = threeToCesium.parse(o_testBall, 
-    data => {
-      // console.debug(data['buffers'][0]['uri']);
-      const getTestModel = Cesium.Model.fromGltfAsync({
-        url: data,
-        show: true,
-        allowPicking: true,
-        asynchronous: true,
-        backFaceCulling: true,
-      });
-
-      getTestModel.then(model => {
-
-        const testget = geomap.entities.getOrCreateEntity('test');
-        testget.model = model;
-        geomap.trackedEntity = testget;
-        // geomap.flyTo(testget)
-      });
-    }, 
-    err => console.error(err), 
-    {
-      trs: true,
-      binary: false /* return as .glb instead of .gltf? */,
-      animations: [],
-      embedImages: true,
-      onlyVisible: true,
-    });
 
     geomap.scene.sunBloom = true;
   }
@@ -319,7 +241,52 @@ const InitHardwareSensors = (cesium: CesiumType.CesiumWidget | CesiumType.Viewer
         SpatialData.geolocation.accuracy.altitude = geoData.coords.altitudeAccuracy;
         SpatialData.geolocation.heading = geoData.coords.heading;
         SpatialData.geolocation.queriedAt = geoData.timestamp;
-        SpatialData.geolocation.groundSpeed = geoData.coords.speed;
+        SpatialData.geolocation.groundSpeed = geoData.coords.speed; 
+
+        const g_testCube = new THREE.BoxGeometry(2, 2, 2);
+        const m_testCube = new THREE.MeshBasicMaterial({ color: 0xFFAC00 });
+        const o_testCube = new THREE.Mesh(g_testCube, m_testCube);
+        const exporter = new GLTFExporter();
+
+        exporter.parseAsync(o_testCube, {
+          animations: [],
+          binary: true,
+          embedImages: true,
+          forceIndices: false,
+          includeCustomExtensions: false,
+          maxTextureSize: Infinity,
+          onlyVisible: true,
+          trs: false,
+        })
+        
+        .then(gltf => {
+          const blob = new Blob([ gltf as ArrayBuffer ], {type: 'application/octet-stream'});
+          const uri = URL.createObjectURL(blob);
+          const position = Cesium.Cartesian3.fromDegrees(geoData.coords.longitude, geoData.coords.latitude);
+          console.debug(cesium);
+          
+          const moon = new Cesium.Moon();
+          const sun = new Cesium.Sun();
+          console.debug(moon, sun);
+          cesium.scene.moon = moon;
+          cesium.scene.sun = sun;
+
+            Cesium.Model.fromGltfAsync({
+              url: uri, 
+              heightReference: Cesium.HeightReference.RELATIVE_TO_GROUND,
+              modelMatrix: Cesium.Transforms.headingPitchRollToFixedFrame(
+                position,
+                new Cesium.HeadingPitchRoll()
+            )})
+
+            .then(model => {
+              model.show = true;
+              model.backFaceCulling = true;
+              model.outlineColor = Cesium.Color.ORANGE;
+              cesium.scene.primitives.add(model);
+            });
+            cesium.camera.flyTo({ destination: position })
+        });
       },
 
       (error) => {
@@ -337,7 +304,6 @@ const InitHardwareSensors = (cesium: CesiumType.CesiumWidget | CesiumType.Viewer
 
   // Needs work but this should be able to orient the camera to match the spatial orientation of the user's device
   const updateLocation = () => setTimeout(() => {
-    console.debug('updating location data');
     cesium.camera.flyTo({
       destination: Cesium.Cartesian3.fromDegrees(SpatialData.geolocation.longitude || 0, SpatialData.geolocation.latitude || 0, 222),
       // orientation: {
@@ -351,5 +317,5 @@ const InitHardwareSensors = (cesium: CesiumType.CesiumWidget | CesiumType.Viewer
     });
   }, 1200);
 
-  updateLocation();
+  // updateLocation();
 }
