@@ -4,7 +4,7 @@ import {
   GLTFExporter, 
   GLTFExporterOptions 
 } from 'three/examples/jsm/exporters/GLTFExporter';
-import * as CesiumType from 'cesium';
+import * as Cesium from 'cesium';
 
 // modules
 import init3D, { 
@@ -16,12 +16,13 @@ import {
   setGlobeInit, 
 } from "..";
 import { Cesium3DTileStyle } from "@cesium/engine";
-import { onAnimate } from '../index';
-import * as Cesium from 'cesium';
 
 // configs
-const Cesium: typeof CesiumType = window['Cesium'];
+window['Cesium'];
 Cesium.Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiJhZDM0OTQ5Yi1lYjQ1LTRkMjQtYjllMC00YjkzOWNkZmIzMDYiLCJpZCI6ODIyOTgsImlhdCI6MTY4OTIxODI0MX0.5o0xQ4T4BCI8afp_0lXzjO_wa0kTOkc7dCdCGnJDiro';
+
+// Global cesium viewer ref
+export let geomap: Cesium.Viewer;
 
 // #1
 export default function Initgeomap() {
@@ -32,7 +33,7 @@ export default function Initgeomap() {
 
   if (!getGlobeInit()) {
     const cesiumContainer = document.getElementById('somata') as HTMLDivElement;
-    const geomap = new Cesium.Viewer(cesiumContainer, {
+    geomap = new Cesium.Viewer(cesiumContainer, {
       msaaSamples: 0,
       scene3DOnly: true,
       skyAtmosphere: false,
@@ -72,19 +73,15 @@ export default function Initgeomap() {
         }
         `,
     }),
-})
-.then(tileset => {
-  geomap.scene.primitives.add(tileset);
-});
+    })
+    .then(tileset => {
+      geomap.scene.primitives.add(tileset);
+    });
 
     // Add horizon sihouette
     const outliner = geomap.scene.postProcessStages.add(Cesium.PostProcessStageLibrary.createSilhouetteStage());
     outliner.uniforms.color = Cesium.Color.WHITE;
     outliner.uniforms.length = 0.12;
-
-    geomap.postProcessStages.add(
-      geomap.postProcessStages.ambientOcclusion 
-    )
     
     // Swap the rendering canvas to an offscreen instance
     geomap.scene.canvas.style.opacity = '0';
@@ -110,41 +107,39 @@ export default function Initgeomap() {
 
     // geomap.trackedEntity
 
-    setInterval(() => {
+    // setInterval(() => {
 
-      const upAxisVector = new THREE.Vector3(
-        Cesium.Math.toDegrees(geomap.camera.up.x),
-        Cesium.Math.toDegrees(geomap.camera.up.y),
-        Cesium.Math.toDegrees(geomap.camera.up.z),
-      );
-      const rightAxisVector = new THREE.Vector3(
-        Cesium.Math.toDegrees(geomap.camera.right.x),
-        Cesium.Math.toDegrees(geomap.camera.right.y),
-        Cesium.Math.toDegrees(geomap.camera.right.z),
-      );
-      const forwardVector = new THREE.Vector3(
-        Cesium.Math.toDegrees(geomap.camera.direction.x),
-        Cesium.Math.toDegrees(geomap.camera.direction.y),
-        Cesium.Math.toDegrees(geomap.camera.direction.z),
-      );
+    //   const upAxisVector = new THREE.Vector3(
+    //     Cesium.Math.toDegrees(geomap.camera.up.x),
+    //     Cesium.Math.toDegrees(geomap.camera.up.y),
+    //     Cesium.Math.toDegrees(geomap.camera.up.z),
+    //   );
+    //   const rightAxisVector = new THREE.Vector3(
+    //     Cesium.Math.toDegrees(geomap.camera.right.x),
+    //     Cesium.Math.toDegrees(geomap.camera.right.y),
+    //     Cesium.Math.toDegrees(geomap.camera.right.z),
+    //   );
+    //   const forwardVector = new THREE.Vector3(
+    //     Cesium.Math.toDegrees(geomap.camera.direction.x),
+    //     Cesium.Math.toDegrees(geomap.camera.direction.y),
+    //     Cesium.Math.toDegrees(geomap.camera.direction.z),
+    //   );
       
-      // console.debug(
-      //   `\nUp Axis Vector:`,    upAxisVector,
-      //   `\nRight Axis Vector:`, rightAxisVector,
-      //   `\nForward Vector:`,    forwardVector
-      // );
-      }, 1000);
+    //   // console.debug(
+    //   //   `\nUp Axis Vector:`,    upAxisVector,
+    //   //   `\nRight Axis Vector:`, rightAxisVector,
+    //   //   `\nForward Vector:`,    forwardVector
+    //   // );
+    //   }, 1000);
 
-      // Cleanup the Cesium bloat
-      document.getElementById('no-show')?.childNodes.forEach(childNode => childNode.remove());
+    // Clean up bloat
+    document.getElementById('no-show')?.childNodes.forEach(childNode => childNode.remove());
 
     // Chain to #2
     init3D();
 
-    // use three.js to dynamically generate meshes, export them to gltf, and then load them into Cesium
-    // Three's camera, scene, and renderer may not even be needed for it
-
     geomap.scene.sunBloom = true;
+
   }
 }
 
@@ -179,7 +174,7 @@ export const SpatialData = {
   }
 };
 
-const InitHardwareSensors = (cesium: CesiumType.CesiumWidget | CesiumType.Viewer) => {
+const InitHardwareSensors = (cesium: Cesium.CesiumWidget | Cesium.Viewer) => {
 
   // Accelerometer polling
   window.ondevicemotion = (accelerometer) => {
@@ -203,10 +198,15 @@ const InitHardwareSensors = (cesium: CesiumType.CesiumWidget | CesiumType.Viewer
     // External device for Interactron activation (e.g. HID)
     const hid = navigator['hid'];
 
+    const sun = new Cesium.Sun();
+    const moon = new Cesium.Moon();
+    sun.glowFactor = 0.6;
+    cesium.scene.sun = sun;
+    cesium.scene.moon = moon;
+
     // GPS polling
     const geo = navigator.geolocation;
     geo.getCurrentPosition(
-
       (geoData) => {
         SpatialData.geolocation.latitude = geoData.coords.latitude;
         SpatialData.geolocation.longitude = geoData.coords.longitude;
@@ -215,58 +215,7 @@ const InitHardwareSensors = (cesium: CesiumType.CesiumWidget | CesiumType.Viewer
         SpatialData.geolocation.accuracy.altitude = geoData.coords.altitudeAccuracy;
         SpatialData.geolocation.heading = geoData.coords.heading;
         SpatialData.geolocation.queriedAt = geoData.timestamp;
-        SpatialData.geolocation.groundSpeed = geoData.coords.speed; 
-
-        const g_testCube = new THREE.BoxGeometry(2, 2, 2);
-        const m_testCube = new THREE.MeshBasicMaterial({ color: 0xFFAC00 });
-        const o_testCube = new THREE.Mesh(g_testCube, m_testCube);
-        const exporter = new GLTFExporter();
-
-        exporter.parseAsync(o_testCube, {
-          animations: [],
-          binary: true,
-          embedImages: true,
-          forceIndices: false,
-          includeCustomExtensions: false,
-          maxTextureSize: Infinity,
-          onlyVisible: true,
-          trs: true,
-        })
-        
-        .then(gltf => {
-          const blob = new Blob([ gltf as ArrayBuffer ], {type: 'application/octet-stream'});
-          const uri = URL.createObjectURL(blob);
-          const position = Cesium.Cartesian3.fromDegrees(geoData.coords.longitude, geoData.coords.latitude, 1);
-          
-          
-          const moon = new Cesium.Moon();
-          const sun = new Cesium.Sun();
-          sun.glowFactor = 0.6;
-          console.debug(moon, sun);
-          cesium.scene.moon = moon;
-          cesium.scene.sun = sun;
-
-            Cesium.Model.fromGltfAsync({
-              cull: true,
-              url: uri, 
-              allowPicking: true,
-              scene: cesium.scene,
-              upAxis: CesiumType.Axis.Y,
-              forwardAxis: CesiumType.Axis.Z,
-              showOutline: true,
-              outlineColor: Cesium.Color.WHITE,
-              heightReference: Cesium.HeightReference.RELATIVE_TO_GROUND,
-              backFaceCulling: true,
-              modelMatrix: Cesium.Transforms.headingPitchRollToFixedFrame(
-                position,
-                new Cesium.HeadingPitchRoll()
-            )})
-
-            .then(model => {
-              cesium.scene.primitives.add(model);
-            });
-            cesium.camera.flyTo({ destination: Cesium.Cartesian3.fromDegrees(geoData.coords.longitude, geoData.coords.latitude, 200)})
-        });
+        SpatialData.geolocation.groundSpeed = geoData.coords.speed;   
       },
 
       (error) => {
@@ -299,6 +248,81 @@ const InitHardwareSensors = (cesium: CesiumType.CesiumWidget | CesiumType.Viewer
 
   // updateLocation();
 }
+
+// Called to create a new data waypoint on the geomap where the reticle is pointing
+export const PlaceWaypoint = () => {
+
+  // Get screen center pixel
+  const centerX = window.innerWidth / 2;
+  const centerY = window.innerHeight / 2;
+
+  // get the pick ray that correlates to the reticle position
+  const ray = geomap.camera.getPickRay(new Cesium.Cartesian2(centerX, centerY));
+
+  // @ts-ignore | ray is never undefined
+  const hitPosition = geomap.scene.globe.pick(ray, geomap.scene);
+  console.log(ray, hitPosition);
+  geomap.entities.add({
+    position: hitPosition,
+    point: {
+      color: Cesium.Color.MAGENTA,
+      pixelSize: 12,
+      heightReference: Cesium.HeightReference.CLAMP_TO_GROUND
+    }
+  });
+
+  const g_testCube = new THREE.BoxGeometry(2, 2, 2);
+  const m_testCube = new THREE.MeshBasicMaterial({ color: 0xFFAC00 });
+  const o_testCube = new THREE.Mesh(g_testCube, m_testCube);
+  const exporter = new GLTFExporter();
+
+        exporter.parseAsync(o_testCube, {
+          animations: [],
+          binary: true,
+          embedImages: true,
+          forceIndices: false,
+          includeCustomExtensions: false,
+          maxTextureSize: Infinity,
+          onlyVisible: true,
+          trs: true,
+        })
+        
+        .then(gltf => {
+          const blob = new Blob([ gltf as ArrayBuffer ], {type: 'application/octet-stream'});
+          const uri = URL.createObjectURL(blob);
+
+          // use three.js to dynamically generate meshes, export them to gltf, and then load them into the geomap
+            Cesium.Model.fromGltfAsync({
+            cull: true,
+            url: uri, 
+            allowPicking: true,
+            scene: geomap.scene,
+            upAxis: Cesium.Axis.Y,
+            forwardAxis: Cesium.Axis.Z,
+            showOutline: true,
+            outlineColor: Cesium.Color.WHITE,
+            heightReference: Cesium.HeightReference.RELATIVE_TO_GROUND,
+            backFaceCulling: true,
+            modelMatrix: Cesium.Transforms.headingPitchRollToFixedFrame(
+              hitPosition as Cesium.Cartesian3,
+              new Cesium.HeadingPitchRoll()
+          )})
+          .then(model => {
+            geomap.scene.primitives.add(model);
+          });
+        });
+  return hitPosition;
+};
+window['PlaceWaypoint'] = PlaceWaypoint;
+
+export const gotoPosition = (lat?: number, lon?: number, alt?: number) => {
+  navigator.geolocation.getCurrentPosition(location => {
+    geomap.scene.camera.flyTo({
+      destination: Cesium.Cartesian3.fromDegrees(lon || location.coords.longitude, lat || location.coords.latitude, alt || 222)
+    });
+  }, err => console.error(err));
+};
+window['gotoPosition'] = gotoPosition;
 
 // IndexDB - Save Local
 export const SaveLocal = () => {};
