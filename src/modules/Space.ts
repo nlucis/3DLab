@@ -51,6 +51,7 @@ export default function Initgeomap() {
       fullscreenButton: false,
       selectionIndicator: false,
       navigationHelpButton: false,
+      // baseLayerPicker: false,
       navigationInstructionsInitiallyVisible: false,
     });
 
@@ -261,22 +262,34 @@ export const PlaceWaypoint = () => {
 
   // @ts-ignore | ray is never undefined
   const hitPosition = geomap.scene.globe.pick(ray, geomap.scene);
-  console.log(ray, hitPosition);
+
   geomap.entities.add({
     position: hitPosition,
+
+    // Anchor point for waypoints
     point: {
-      color: Cesium.Color.MAGENTA,
-      pixelSize: 12,
+      color: Cesium.Color.BLACK,
+      outlineColor: Cesium.Color.WHITE,
+      outlineWidth: 3,
+      pixelSize: 9,
       heightReference: Cesium.HeightReference.CLAMP_TO_GROUND
     }
   });
 
-  const g_testCube = new THREE.BoxGeometry(2, 2, 2);
+  const g_testCube = new THREE.BoxGeometry(3, 3, 3);
   const m_testCube = new THREE.MeshBasicMaterial({ color: 0xFFAC00 });
   const o_testCube = new THREE.Mesh(g_testCube, m_testCube);
+
+  // Since Cesium places models on the ground based on their origin / centroid, use a group to offset the meshes
+  const metaScene = new THREE.Group();
+
+  // offset by 2 units so object "floats" slightly above anchor point
+  o_testCube.position.setY(2);
+
+  metaScene.add(o_testCube);
   const exporter = new GLTFExporter();
 
-        exporter.parseAsync(o_testCube, {
+        exporter.parseAsync(metaScene, {
           animations: [],
           binary: true,
           embedImages: true,
@@ -301,13 +314,15 @@ export const PlaceWaypoint = () => {
             forwardAxis: Cesium.Axis.Z,
             showOutline: true,
             outlineColor: Cesium.Color.WHITE,
-            heightReference: Cesium.HeightReference.RELATIVE_TO_GROUND,
+            heightReference: Cesium.HeightReference.CLAMP_TO_GROUND,
             backFaceCulling: true,
             modelMatrix: Cesium.Transforms.headingPitchRollToFixedFrame(
               hitPosition as Cesium.Cartesian3,
-              new Cesium.HeadingPitchRoll()
+              new Cesium.HeadingPitchRoll(),
+              geomap.scene.globe.ellipsoid
           )})
           .then(model => {
+            geomap.entities.add(model);
             geomap.scene.primitives.add(model);
           });
         });
@@ -317,7 +332,7 @@ window['PlaceWaypoint'] = PlaceWaypoint;
 
 export const gotoPosition = (lat?: number, lon?: number, alt?: number) => {
   navigator.geolocation.getCurrentPosition(location => {
-    geomap.scene.camera.flyTo({
+    geomap.camera.flyTo({
       destination: Cesium.Cartesian3.fromDegrees(lon || location.coords.longitude, lat || location.coords.latitude, alt || 222)
     });
   }, err => console.error(err));
