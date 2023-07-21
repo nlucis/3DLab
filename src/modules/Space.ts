@@ -37,6 +37,7 @@ export default function Initgeomap() {
       msaaSamples: 0,
       scene3DOnly: true,
       skyAtmosphere: false,
+      useDefaultRenderLoop: false,
       sceneMode: Cesium.SceneMode.SCENE3D,
       creditContainer: document.getElementById('no-show') as HTMLDivElement, // will be displayed on load and in console instead
       terrain: Cesium.Terrain.fromWorldTerrain({requestVertexNormals: true}),
@@ -51,7 +52,6 @@ export default function Initgeomap() {
       fullscreenButton: false,
       selectionIndicator: false,
       navigationHelpButton: false,
-      // baseLayerPicker: false,
       navigationInstructionsInitiallyVisible: false,
     });
 

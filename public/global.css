@@ -24,7 +24,21 @@ body {
   background-color: transparent;
 }
 
-#ui-base, #ui-rotary-zone, #ui-rotary-dial, #ui-rotary-selector {
+#UI {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+}
+
+#ui-base, 
+#ui-rotary-zone, 
+#ui-rotary-dial, 
+#ui-rotary-selector,
+#ui-finalize-waypoint
+{
   position: absolute;
   top: 0;
   left: 0;
