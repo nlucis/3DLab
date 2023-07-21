@@ -1,4 +1,4 @@
-import initUI, { UI, UICanvas } from "./InitUI";
+import initUI, { UI, UICanvas, stage } from "./InitUI";
 import * as THREE from 'three';
 ;
 import { SMAAPass } from 'three/examples/jsm/postprocessing/SMAAPass';
@@ -8,7 +8,6 @@ import { TAARenderPass } from 'three/examples/jsm/postprocessing/TAARenderPass';
 import {UnrealBloomPass} from 'three/examples/jsm/postprocessing/UnrealBloomPass';
 import {EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer';
 import { ArcballControls } from 'three/examples/jsm/controls/ArcballControls';
-import { onAnimate } from "..";
 import { geomap } from "./Space";
 import * as PIXI from 'pixi.js';
 
@@ -56,7 +55,7 @@ export default function init3D() {
 
 
   const Visualizer = new THREE.Points(gPoints, mPoints);
-  onAnimate.push(() => {
+  PIXI.Ticker.shared.add(() => {
     Visualizer.rotation.x += 0.006;
     Visualizer.rotation.y -= 0.003;
     Visualizer.rotation.z += 0.009;
@@ -89,8 +88,6 @@ export default function init3D() {
   // Convert the Cesium globe canvas to a texture for layering as well
   const cesiumTex = new THREE.CanvasTexture(window['geomapCanvas']);
 
-  const UITexture = new THREE.CanvasTexture(UICanvas);
-
   // Post-Processing
   const composer = new EffectComposer(Renderer);
   const bloom = new UnrealBloomPass(
@@ -110,16 +107,13 @@ export default function init3D() {
   /* NOTE: clear alphas must be a value less than 1 or the TAA pass wont show */
   composer.addPass(new TAARenderPass(Scene, Camera, 0x120A0E, 1.0));
   composer.addPass(new TexturePass(cesiumTex, 0.64)); // if the alpha is too high, bloom ends up over-exposing the layer
-  composer.addPass(new TexturePass(UITexture, 0.64));
+
   composer.addPass(bloom);
   composer.addPass(scan);
   composer.addPass(smaa);
 
   PIXI.Ticker.shared.add(() => {
     cesiumTex.needsUpdate = true;
-    UITexture.needsUpdate = true;
-
-    UI.render();
     geomap.render();
     composer.render();
   }); 
