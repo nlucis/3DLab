@@ -79,11 +79,11 @@ export default function init3D() {
     TetraBack
   );
   // Simulate vox flashing
-  // let opacityMax = 6.0;
-  // let opacityMin = 0.6;
-  // setInterval(() => {
-  //   mPoints.opacity = THREE.MathUtils.randFloat(opacityMin, opacityMax);
-  // }, 64);
+  let opacityMax = 6.0;
+  let opacityMin = 0.6;
+  setInterval(() => {
+    mPoints.opacity = THREE.MathUtils.randFloat(opacityMin, opacityMax);
+  }, 64);
 
   // Convert the Cesium globe canvas to a texture for layering as well
   const cesiumTex = new THREE.CanvasTexture(window['geomapCanvas']);

@@ -50,7 +50,7 @@ export default function initUI() {
       const defaultFill = pathElement.getAttribute('fill') as string;
 
     // Turn the polyplate white when pressed
-    Interactron.addEventListener('pointerdown', p => {pathElement.setAttribute('fill', enabledFill); PlaceWaypoint()});
+    Interactron.addEventListener('pointerdown', p => {pathElement.setAttribute('fill', enabledFill); PlaceWaypoint()}); // Testing effect by placing waypoints on click
     Interactron.addEventListener('pointerup'  , p => {pathElement.setAttribute('fill', defaultFill)});
   });
 

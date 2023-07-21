@@ -31,7 +31,7 @@ export default function Initgeomap() {
   Cesium.Primitive
   Cesium.Entity
 
-  if (!getGlobeInit()) {
+  if (!geomap) {
     const cesiumContainer = document.getElementById('somata') as HTMLDivElement;
     geomap = new Cesium.Viewer(cesiumContainer, {
       msaaSamples: 0,
@@ -276,7 +276,7 @@ export const PlaceWaypoint = () => {
     }
   });
 
-  const g_testCube = new THREE.BoxGeometry(3, 3, 3);
+  const g_testCube = new THREE.TorusGeometry(3, 0.6, 24, 64);
   const m_testCube = new THREE.MeshBasicMaterial({ color: 0xFFAC00 });
   const o_testCube = new THREE.Mesh(g_testCube, m_testCube);
 
@@ -285,6 +285,7 @@ export const PlaceWaypoint = () => {
 
   // offset by 2 units so object "floats" slightly above anchor point
   o_testCube.position.setY(2);
+  o_testCube.rotation.set(THREE.MathUtils.degToRad(90), 0, 0);
 
   metaScene.add(o_testCube);
   const exporter = new GLTFExporter();
