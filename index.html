@@ -5,7 +5,13 @@
 
   <!-- Metadata -->
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" media="(prefers-color-scheme: dark)" content="black">
+
+    <!-- PWA -->
+    <link rel="manifest" href=".webmanifest">
+    <link rel="apple-touch-icon" href="assets/icons/icon_192x192.png">
 
   <!-- CesiumJS JavaScript and CSS files -->
   <script src="https://cesium.com/downloads/cesiumjs/releases/1.107.1/Build/Cesium/Cesium.js"></script>
@@ -14,6 +20,10 @@
   <!-- Core Font & Global styles -->
   <link href="" rel="styles" type="text/css">
   <link rel="stylesheet" type="text/css" href="public/styles/global.css">
+
+  <!-- Preload Scripts -->
+  <script src="https://cdn.socket.io/4.5.4/socket.io.min.js" preload></script>
+  <script type="module" src="/src/index.ts" preload></script>
 </head>
 <body>
   <main>
@@ -21,12 +31,38 @@
     <canvas id="target"></canvas>
     <div id="somata"></div>
     <section id="UI"></section>
+
+    <span id="copyright-notice">
+      Copyright &copy; 2023 All Rights Reserved.
+      👽 Arjay Jones | nLucis Creative
+    </span>
   </main>
 
   <footer>
-    <script type="module" src="src/index.ts"></script>
+    <!-- FSM -->
     <script type="module" src="src/SILVIC.ts"></script>
+    
+    <!-- PWA -->
+    <!-- <script type="module" src="sw.js"></script> -->
+    <!-- <script type="text/javascript" id="app-installer">
+      if ('serviceWorker' in window.navigator) {
+        // Register the Service Worker
+        window.addEventListener('DOMContentLoaded', () => {
+        navigator.serviceWorker.register('/sw.js', {
+          scope: "/"
+        });
+        });
+        // What should this do to prompt a user to install the app?
+        window['onbeforeinstallprompt'] = () => {};
+        // What should this do as soon as a user opts to install app?
+        window['onappinstalled'] = () => {};
+        // Do this when the app is connected to the internet
+        window.ononline = () => {}; 
+        // Do this if the app loses a connection to the internet
+        window.onoffline = () => {};
+      }
+    </script> -->
   </footer>
-  <div id="no-show"></div>
+  <div class="no-show"></div>
 </body>
 </html>

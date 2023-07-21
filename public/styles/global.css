@@ -1,3 +1,5 @@
+@import url('./fonts');
+
 html {
   margin: 0;
   padding: 0;
@@ -6,6 +8,7 @@ html {
   cursor: crosshair;
   background-color: magenta;
 }
+
 body {
   margin: 0;
   padding: 0;
@@ -13,6 +16,7 @@ body {
   height: 100%;
   overflow: hidden;
 }
+
 #target {
   position: absolute;
   top: 0;
@@ -23,6 +27,7 @@ body {
   pointer-events: none;
   background-color: transparent;
 }
+
 #pix-ui {
   width: 100%;
   height: 100%;
@@ -69,8 +74,27 @@ body {
   /* pointer-events: none; */
   background: transparent;
 }
-#no-show {
+
+/* -- Copyright -- */
+#copyright-notice {
+  z-index:4;
+  color: white;
+  font-size: 0.9svh;
+  font-family: RaMono;
+  text-align: center;
+  vertical-align: center;
+
+  width: 100%;
+  margin: 6px 0;
+}
+
+/* Toggleable classes */
+.no-show {
   opacity: 0;
   z-index: -1;
   position: absolute;
+}
+.no-touch {
+  touch-action: none !important;
+  pointer-events: none !important;
 }
