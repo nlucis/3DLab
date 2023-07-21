@@ -17,8 +17,12 @@ export default function initUI() {
     core: <SVGGElement | undefined> undefined
   };
 
-  // Parse the template SVG structure for sub-elements
-  readSVG('public/assets/svgs/base/Template.svg').then(svgData => {
+  // Load the IRIS template SVG and parse it's structure for sub-elements
+  readSVG('public/assets/svgs/base/IRIS.svg').then(svgData => {
+    const UI = svgData.content;
+
+    // delete this before deployment
+    console.debug(UI);
 
     // Get the main Artboard
     const artboard = svgData.content.getElementById('ArtboardFrame').getElementsByTagName('rect')[0];
