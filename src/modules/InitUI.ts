@@ -2,9 +2,31 @@ import Main from "../SILVIC";
 import { Ticker } from 'pixi.js';
 import { SVGScene } from '@pixi-essentials/svg';
 import { PlaceWaypoint } from "./Space";
+import { Type } from "typescript";
 
 
 const readSVG = async (uri: string) => {return await SVGScene.from(uri)};
+
+
+const extractProperties = async (element: SVGElement) => {
+    const props = { };
+
+    Array.from(element.childNodes).forEach(async childNode => {
+
+      const name = childNode.nodeName.replace('#', '') as string;
+      props[name] = {}; // create empty object to hold attributes and values
+
+      const attrs = await childNode['attributes'] as NamedNodeMap | undefined;
+
+      if (attrs) for (let attrID = 0; attrID < attrs.length; attrID++) {
+        const propName = (childNode['attributes'] as NamedNodeMap).item(attrID)?.localName;
+        const propValue = (childNode['attributes'] as NamedNodeMap).item(attrID)?.value;
+        props[name][propName] = propValue; 
+      }
+    });
+
+    return props;
+  };
 
 // #4
 export default function initUI() {
@@ -12,36 +34,25 @@ export default function initUI() {
   const centerX = window.innerWidth / 2;
   const centerY = window.innerHeight / 2;
 
-  // Template Components
-  const interactron = {
-    core: <SVGGElement | undefined> undefined
-  };
 
   // Load the IRIS template SVG and parse it's structure for sub-elements
   readSVG('public/assets/svgs/base/IRIS.svg').then(svgData => {
     const UI = svgData.content;
 
+    // Add the IRIS UI to the DOM
+    document.getElementById('UI')?.appendChild(UI);
+
     // delete this before deployment
     console.debug(UI);
 
     // Get the main Artboard
-    const artboard = svgData.content.getElementById('ArtboardFrame').getElementsByTagName('rect')[0];
-    const artboardWidth = parseInt(artboard.getAttribute('height') as string);
-    const artboardHeight = parseInt(artboard.getAttribute('width') as string);
+    const Artboard = UI.getElementById('ArtboardFrame').getElementsByTagName('rect')[0];
 
-    const abAspectRatio = artboardWidth / artboardHeight;
-    console.debug(abAspectRatio);
+    /* -- Extract Components -- */
+    const Interactron = UI.getElementById('Interactron') as SVGGElement;
 
-    // Add the base template to DOM
-    document.getElementById('UI')?.appendChild(svgData.content); 
-
-
-    // Extract sub-elements
-    /* -- Interactron -- */
-    const Interactron = svgData.content.getElementById('Interactron') as SVGGElement;
-
-    // Override inherited point-events property
-    Interactron.setAttribute('style', `pointer-events: all;`);
+    /* -- Extract Component Properties -- */
+    extractProperties(Interactron);
 
     // Get the PolyPlate graphics element
     const polyPlate = Array.from(Interactron.childNodes).filter(childNode => {
@@ -53,7 +64,7 @@ export default function initUI() {
       const enabledFill = '#FFFFFF';
       const defaultFill = pathElement.getAttribute('fill') as string;
 
-    // Turn the polyplate white when pressed
+    // Turn the polyplate white when pressedq
     Interactron.addEventListener('pointerdown', p => {pathElement.setAttribute('fill', enabledFill); PlaceWaypoint()}); // Testing effect by placing waypoints on click
     Interactron.addEventListener('pointerup'  , p => {pathElement.setAttribute('fill', defaultFill)});
   });

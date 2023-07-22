@@ -32,7 +32,7 @@ export default function Initgeomap() {
   Cesium.Entity
 
   if (!geomap) {
-    const cesiumContainer = document.getElementById('somata') as HTMLDivElement;
+    const cesiumContainer = document.getElementById('geomap') as HTMLDivElement;
     geomap = new Cesium.Viewer(cesiumContainer, {
       msaaSamples: 0,
       scene3DOnly: true,
