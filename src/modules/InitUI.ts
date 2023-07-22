@@ -36,7 +36,7 @@ export default function initUI() {
 
 
   // Load the IRIS template SVG and parse it's structure for sub-elements
-  readSVG('public/assets/svgs/base/IRIS.svg').then(svgData => {
+  readSVG('public/assets/svgs/base/IRIS.svg').then(async svgData => {
     const UI = svgData.content;
 
     // Add the IRIS UI to the DOM
@@ -52,7 +52,8 @@ export default function initUI() {
     const Interactron = UI.getElementById('Interactron') as SVGGElement;
 
     /* -- Extract Component Properties -- */
-    extractProperties(Interactron);
+    const interactronProps = extractProperties(Interactron);
+    console.debug(await interactronProps);
 
     // Get the PolyPlate graphics element
     const polyPlate = Array.from(Interactron.childNodes).filter(childNode => {
