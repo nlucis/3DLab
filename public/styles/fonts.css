@@ -51,6 +51,10 @@
   src: url('https://nlucis.github.io/fontbank/monkey.ttf');
 }
 @font-face {
+  font-family: ModeNine;
+  src: url('https://nlucis.github.io/fontbank/mode-nine.ttf');
+}
+@font-face {
   font-family: Punk;
   src: url('https://nlucis.github.io/fontbank/punk.ttf');
 }

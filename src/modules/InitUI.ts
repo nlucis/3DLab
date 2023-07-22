@@ -8,7 +8,23 @@ import { Type } from "typescript";
 const readSVG = async (uri: string) => {return await SVGScene.from(uri)};
 
 const extractComponents = async (svg: SVGSVGElement) => {
-  const components = {};
+  const components = {
+    layer: {}
+  };
+
+  Array.from(svg.childNodes).forEach(async component => {
+    // check that the component has an ID and does not belong to the defs layer
+    const hasID = component['id'] !== undefined;
+    const notDefs = component.nodeName !== 'defs';
+
+    if (hasID && notDefs) {
+      const layerID = component['id'] as string;
+      component.childNodes.forEach(node => {
+        console.debug(node.nodeValue);
+      });
+      console.debug(layerID);
+    }
+  });
 
   return components;
 };
