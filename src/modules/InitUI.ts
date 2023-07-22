@@ -9,24 +9,21 @@ const readSVG = async (uri: string) => {return await SVGScene.from(uri)};
 
 
 const extractProperties = async (element: SVGElement) => {
-    const props = { };
+  const props = { };
 
-    Array.from(element.childNodes).forEach(async childNode => {
+  Array.from(element.childNodes).forEach(async childNode => {
+    const name = childNode.nodeName.replace('#', '') as string;
+    props[name] = {}; // create empty object to hold attributes and values
+    const attrs = await childNode['attributes'] as NamedNodeMap | undefined;
+    if (attrs) for (let attrID = 0; attrID < attrs.length; attrID++) {
+      const propName = (childNode['attributes'] as NamedNodeMap).item(attrID)?.localName;
+      const propValue = (childNode['attributes'] as NamedNodeMap).item(attrID)?.value;
+      props[name][propName] = propValue; 
+    }
+  });
 
-      const name = childNode.nodeName.replace('#', '') as string;
-      props[name] = {}; // create empty object to hold attributes and values
-
-      const attrs = await childNode['attributes'] as NamedNodeMap | undefined;
-
-      if (attrs) for (let attrID = 0; attrID < attrs.length; attrID++) {
-        const propName = (childNode['attributes'] as NamedNodeMap).item(attrID)?.localName;
-        const propValue = (childNode['attributes'] as NamedNodeMap).item(attrID)?.value;
-        props[name][propName] = propValue; 
-      }
-    });
-
-    return props;
-  };
+  return props;
+};
 
 // #4
 export default function initUI() {
