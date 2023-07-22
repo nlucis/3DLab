@@ -7,6 +7,11 @@ import { Type } from "typescript";
 
 const readSVG = async (uri: string) => {return await SVGScene.from(uri)};
 
+const extractComponents = async (svg: SVGSVGElement) => {
+  const components = {};
+
+  return components;
+};
 
 const extractProperties = async (element: SVGElement) => {
   const props = { };
@@ -31,26 +36,23 @@ export default function initUI() {
   const centerX = window.innerWidth / 2;
   const centerY = window.innerHeight / 2;
 
-
-  // Load the IRIS template SVG and parse it's structure for sub-elements
+  // Load the IRIS template SVG and parse it's structure for sub-elements and their properties
   readSVG('public/assets/svgs/base/IRIS.svg').then(async svgData => {
     const UI = svgData.content;
 
-    // Add the IRIS UI to the DOM
-    document.getElementById('UI')?.appendChild(UI);
-
-    // delete this before deployment
-    console.debug(UI);
-
-    // Get the main Artboard
-    const Artboard = UI.getElementById('ArtboardFrame').getElementsByTagName('rect')[0];
-
     /* -- Extract Components -- */
+    const UIComponents = extractComponents(UI);
+    console.debug(await UIComponents);
+
     const Interactron = UI.getElementById('Interactron') as SVGGElement;
 
     /* -- Extract Component Properties -- */
     const interactronProps = extractProperties(Interactron);
     console.debug(await interactronProps);
+
+    // Add the IRIS UI to the DOM
+    document.getElementById('UI')?.appendChild(UI);
+
 
     // Get the PolyPlate graphics element
     const polyPlate = Array.from(Interactron.childNodes).filter(childNode => {
