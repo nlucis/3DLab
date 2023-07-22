@@ -9,21 +9,67 @@ const readSVG = async (uri: string) => {return await SVGScene.from(uri)};
 
 const extractComponents = async (svg: SVGSVGElement) => {
   const components = {
-    layer: {}
+    layers: {
+      // props: {}
+      // parts
+        // components
+          // properties
+    }
   };
 
   Array.from(svg.childNodes).forEach(async component => {
-    // check that the component has an ID and does not belong to the defs layer
-    const hasID = component['id'] !== undefined;
-    const notDefs = component.nodeName !== 'defs';
 
-    if (hasID && notDefs) {
-      const layerID = component['id'] as string;
-      component.childNodes.forEach(node => {
-        console.debug(node.nodeValue);
+    // if a component has children and an ID, it is a layer, otherwise it is a group (g)
+    const hasID = component['id'] !== undefined;
+
+    // Top-Level layers
+    if (component.hasChildNodes() && hasID && component.nodeName === 'g') {
+      components.layers[component['id']] = {
+        paths: {},
+        groups: {},
+      };
+
+      Array.from(component['children'] as SVGElement[]).forEach(child => {
+
+        // Get groups within each layer
+        if (child.nodeName === 'g') {
+          const groupName = child['attributes']['vectornator:layerName'].value;
+          components.layers[component['id']].groups[groupName] = {};
+        }
+        
+        // Get the paths within each layer
+        if (child.nodeName === 'path') {
+          const pathName = child['attributes']['vectornator:layerName'].value;
+          const pathAttributes = child['attributes'] as NamedNodeMap;
+
+          components.layers[component['id']].paths[pathName] = {
+            /* NOTE: if this needs to be broken down into individual points, split the string using the following: 
+             * MoveTo - "M"{pixel_number}, "m"{pixel_number}
+             * LineTo - {number}"L"{number}, {number}"l"{number}, "H", "h", "V", "v"
+             * Cubic Bezier Curve - "C", "c", "S", "s"
+             * Elliptical Arc Curve - "A", "a"
+             * ClosePath - "Z", "z"
+            */
+            data: pathAttributes.getNamedItem('d')?.nodeValue, 
+            props: {}
+          };
+
+          // populate props data
+          for (let attrID = 0; attrID < pathAttributes.length; attrID++) {
+            const propName = pathAttributes.item(attrID)?.nodeName;
+            const propData = pathAttributes.item(attrID)?.nodeValue;
+            if (propName !== 'd') components.layers[component['id']].paths[pathName].props[propName] = propData;
+          }
+        }
       });
-      console.debug(layerID);
+
+      component['attributes']
+      component['children']
     }
+
+    // if a child does not have a layerName attribute, it is a base component
+
+    // TODO: remove the sample1 and sample2 text elements
   });
 
   return components;
@@ -35,7 +81,9 @@ const extractProperties = async (element: SVGElement) => {
   Array.from(element.childNodes).forEach(async childNode => {
     const name = childNode.nodeName.replace('#', '') as string;
     props[name] = {}; // create empty object to hold attributes and values
+
     const attrs = await childNode['attributes'] as NamedNodeMap | undefined;
+
     if (attrs) for (let attrID = 0; attrID < attrs.length; attrID++) {
       const propName = (childNode['attributes'] as NamedNodeMap).item(attrID)?.localName;
       const propValue = (childNode['attributes'] as NamedNodeMap).item(attrID)?.value;
