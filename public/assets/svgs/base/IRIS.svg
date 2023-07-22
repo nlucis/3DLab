@@ -969,7 +969,7 @@
 <use xlink:href="#Fill"/>
 </clipPath>
 <g clip-path="url(#ClipPath)">
-<text fill="#ffffff" font-family="ModeNine" font-size="9" opacity="1" stroke="#ffffff" stroke-linecap="round" stroke-linejoin="round" stroke-width="0.3" text-anchor="start" transform="matrix(1 0 0 1 25.4896 361.736)" vectornator:layerName="Sample2" vectornator:width="319.297" x="0" y="0">
+<text fill="#ffffff" font-family="RaMono" font-size="9" opacity="1" stroke="#ffffff" stroke-linecap="round" stroke-linejoin="round" stroke-width="0.3" text-anchor="start" transform="matrix(1 0 0 1 25.4896 361.736)" vectornator:layerName="Sample2" vectornator:width="319.297" x="0" y="0">
 <tspan textLength="307.8" x="0" y="7">Lorem ipsum dolor sit amet, consectetur adipiscing elit, </tspan>
 <tspan textLength="318.6" x="0" y="19">sed do eiusmod tempor incididunt ut labore et dolore magna </tspan>
 <tspan textLength="297" x="0" y="31">aliqua. Pretium vulputate sapien nec sagittis aliquam. </tspan>
@@ -992,7 +992,7 @@
 <tspan textLength="275.4" x="0" y="235">nunc aliquet bibendum enim facilisis gravida neque </tspan>
 <tspan textLength="64.8" x="0" y="247">convallis a.</tspan>
 </text>
-<text fill="#ffffff" font-family="ModeNine" font-size="9" opacity="1" stroke="#ffffff" stroke-linecap="round" stroke-linejoin="round" stroke-width="0.3" text-anchor="start" transform="matrix(1 0 0 1 25.4896 69.3729)" vectornator:layerName="Sample1" vectornator:width="319.297" x="0" y="0">
+<text fill="#ffffff" font-family="RaMono" font-size="9" opacity="1" stroke="#ffffff" stroke-linecap="round" stroke-linejoin="round" stroke-width="0.3" text-anchor="start" transform="matrix(1 0 0 1 25.4896 69.3729)" vectornator:layerName="Sample1" vectornator:width="319.297" x="0" y="0">
 <tspan textLength="307.8" x="0" y="7">Lorem ipsum dolor sit amet, consectetur adipiscing elit, </tspan>
 <tspan textLength="318.6" x="0" y="19">sed do eiusmod tempor incididunt ut labore et dolore magna </tspan>
 <tspan textLength="297" x="0" y="31">aliqua. Pretium vulputate sapien nec sagittis aliquam. </tspan>
