@@ -3,10 +3,13 @@ import { Ticker } from 'pixi.js';
 import { SVGScene } from '@pixi-essentials/svg';
 import { PlaceWaypoint } from "./Space";
 import { Type } from "typescript";
+import UIComponent from "../components/UIComponent";
 
 
 const readSVG = async (uri: string) => {return await SVGScene.from(uri)};
 
+
+// TODO: Optimize this to work recursively
 const extractComponents = async (svg: SVGSVGElement) => {
   const components = {
     layers: {
@@ -17,24 +20,81 @@ const extractComponents = async (svg: SVGSVGElement) => {
     }
   };
 
+  const extractPath = (pathElement: any) => {
+
+    const pathAttributes = (pathElement['attributes'] as NamedNodeMap); 
+    const pathName = pathAttributes.getNamedItem('vectornator:layerName')?.nodeValue;
+    const pathData = pathAttributes.getNamedItem('d')?.nodeValue as string;
+
+    const path = {
+      pathName: pathName,
+      pathData: pathData,
+      props: {}
+    };
+
+    for (let attrID = 0; attrID < pathAttributes.length; attrID++) {
+      const nodeName = pathAttributes.item(attrID)?.nodeName as string;
+      const nodeData = pathAttributes.item(attrID)?.nodeValue;
+      if (nodeName !== 'd' && nodeName !== 'vectornator:layerName') path.props[nodeName] = nodeData;
+    }
+
+    return path;
+  };
+
   Array.from(svg.childNodes).forEach(async component => {
 
     // if a component has children and an ID, it is a layer, otherwise it is a group (g)
-    const hasID = component['id'] !== undefined;
+    const hasID = (component['id'] !== undefined && component['id'] !== null);
 
     // Top-Level layers
     if (component.hasChildNodes() && hasID && component.nodeName === 'g') {
       components.layers[component['id']] = {
+        id: component['id'],
         paths: {},
         groups: {},
+        opacity: 0,
       };
+
+      // console.debug(componentElement);
+      // componentElement.style.opacity = components.layers[component['id']].opacity;
+
+      // console.debug(`Component Attributes:`, component['attributes']);
 
       Array.from(component['children'] as SVGElement[]).forEach(child => {
 
         // Get groups within each layer
         if (child.nodeName === 'g') {
+      const componentElement = document.getElementById(component['id']) as HTMLElement;
           const groupName = child['attributes']['vectornator:layerName'].value;
-          components.layers[component['id']].groups[groupName] = {};
+          components.layers[component['id']].groups[groupName] = {paths: {}};
+
+          // Extract out all paths at a flattened depth
+          Array.from(child.children).forEach(subChild => {
+
+            if (subChild.nodeName === 'g') {
+
+              // drill down to nested paths
+              // console.debug(
+              //   subChild.children,
+              //   subChild.getAttribute('vectornator:layerName')
+              // );
+              // Array.of(subChild.children).forEach(child => {
+              //   console.debug(`child:`, child);
+              // });
+            }
+
+            else
+
+            if (subChild.nodeName === 'path') {
+              const path = extractPath(subChild);
+              components.layers[component['id']].groups[groupName].paths[path.pathName] = {
+                data: path.pathData,
+                props: path.props
+              }
+            }
+          });
+          // get the sub-groups
+          // extract the path data and props from each sub group
         }
         
         // Get the paths within each layer
@@ -62,9 +122,6 @@ const extractComponents = async (svg: SVGSVGElement) => {
           }
         }
       });
-
-      component['attributes']
-      component['children']
     }
 
     // if a child does not have a layerName attribute, it is a base component
@@ -100,6 +157,8 @@ export default function initUI() {
   const centerX = window.innerWidth / 2;
   const centerY = window.innerHeight / 2;
 
+  let textDisplay: UIComponent;
+
   // Load the IRIS template SVG and parse it's structure for sub-elements and their properties
   readSVG('public/assets/svgs/base/IRIS.svg').then(async svgData => {
     const UI = svgData.content;
@@ -107,6 +166,8 @@ export default function initUI() {
     /* -- Extract Components -- */
     const UIComponents = extractComponents(UI);
     console.debug(await UIComponents);
+
+
 
     const Interactron = UI.getElementById('Interactron') as SVGGElement;
 
@@ -116,6 +177,43 @@ export default function initUI() {
 
     // Add the IRIS UI to the DOM
     document.getElementById('UI')?.appendChild(UI);
+        
+      const gNodes = document.getElementsByTagName('g');
+      const pathNodes = document.getElementsByTagName('path');
+
+      const parseNodes = (nodes: HTMLCollectionOf<SVGGElement | SVGPathElement>) => {
+
+        Array.from(nodes).forEach(node => {
+          const nodeName = node.getAttribute('vectornator:layerName');
+        if (nodeName !== null) {
+          // console.debug(`node`, nodeName);
+
+          if (nodeName === 'TextDisplay') {
+            textDisplay = new UIComponent(node);
+            textDisplay.setOpacity(0);
+          }
+          if (nodeName === 'Keypad') {
+            node.style.opacity = '0';
+          }
+          if (nodeName === 'MessageTypes') {
+            node.style.opacity = '0';
+            node.addEventListener('', () => {});
+          }
+          if (nodeName === 'NewMessageIcon'
+            || nodeName === 'Dialer'
+            || nodeName === 'FinalizeAdd'
+            || nodeName === 'Routines'
+          ) {
+            node.style.opacity = '0';
+          }
+        }
+        })
+      };
+
+      parseNodes(gNodes);
+      parseNodes(pathNodes);
+
+        // console.debug(`groups`, groups);
 
 
     // Get the PolyPlate graphics element
