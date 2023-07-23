@@ -3,16 +3,17 @@ import { Ticker } from 'pixi.js';
 export default class UIComponent {
   constructor(targetElement: SVGGElement | SVGPathElement) {
     this.domElement = targetElement;
-
-    this._opacity = parseInt(this.domElement.style.opacity);
+    this._opacity = this.domElement.style.opacity !== "" ? parseFloat(this.domElement.style.opacity) : 1;
     
     if (targetElement.nodeName === 'path') {
       this._fill = parseInt(targetElement.getAttribute('fill') || '-Infinity');
       this._stroke = parseInt(targetElement.getAttribute('stroke') || '-Infinity');
       this._lineWidth = parseInt(targetElement.getAttribute('stroke-width') || '-Infinity'); 
     }
+
     Ticker.shared.add(this.update.bind(this));
   }
+
   protected domElement: SVGGElement | SVGPathElement;
 
   private _fill: number;
@@ -29,6 +30,7 @@ export default class UIComponent {
   public getStroke(): number {return this._stroke};
   public getOpacity(): number {return this._opacity};
   public getLineWidth(): number {return this._lineWidth};
+  public getDomElement(): SVGGElement | SVGPathElement {return this.domElement};
 
   public setFill(newFill: number): void {this._fill = newFill};
   public setStroke(newStroke: number): void {this._stroke = newStroke};
