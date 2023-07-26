@@ -171,10 +171,19 @@ export default function initUI() {
   let textDisplay: UIComponent;
 
   // Load the IRIS template SVG and parse it's structure for sub-elements and their properties
-  readSVG('public/assets/svgs/base/IRIS.svg').then(async svgData => {
+  readSVG('public/assets/svgs/base/IRIS_All.svg').then(async svgData => {
     const UI = svgData.content;
 
-    const Interactron = UI.getElementById('Interactron') as SVGGElement;
+    Array.from(UI.children as HTMLCollection).forEach(UILayer => {
+
+      // Get, set, and save the state of the personal UI
+      class UIStateComponent {
+        constructor() {
+          
+        }
+      }
+      console.debug(UILayer.id);
+    });
 
     // Add the IRIS UI to the DOM
     document.getElementById('UI')?.appendChild(UI);
@@ -184,21 +193,10 @@ export default function initUI() {
     const getKeys = async (fromObject: any, addTo?: string[]) => {
       const keys = addTo || [];
 
+
       Object.keys(fromObject).forEach(key => {
-        if (key !== 'main') {
-          keys.push(key);
-          const subObject = fromObject[key];
-          if (subObject) Object.keys(subObject).forEach(subKey => {
-            if (subKey !== 'main') {
-              keys.push(subKey);
-              if (subObject[subKey]) Object.keys(subObject[subKey]).forEach(finalKey => {
-                if (finalKey !== 'main') {
-                  keys.push(finalKey);
-                }
-              })
-            }
-          });
-        }
+        console.debug(fromObject, fromObject[key]);
+
       });
       return keys;
     };
@@ -243,7 +241,7 @@ export default function initUI() {
     UIComponents.Visualizer.Oculum?.setOpacity(0.0);
 
     // TODO: this works but shouldn't; fix population logic to resolve issue
-    UIComponents.DataWaypointCreator.FinalizeAdd.setOpacity(0.0);
+    // UIComponents.DataWaypointCreator.FinalizeAdd.setOpacity(0.0);
     const addButton = UIComponents.DataWaypointCreator.AddButton?.getDomElement();
     if (addButton) addButton.style.pointerEvents = 'all';
     addButton?.addEventListener('pointerdown', pd => {
@@ -258,7 +256,7 @@ export default function initUI() {
         if (child.getAttribute('vectornator:layerName') === 'GyroscopeAndGeomap') {
           Array.from(child.children as HTMLCollection).forEach(subChild => {
             if (subChild.getAttribute('vectornator:layerName') === 'GeomapTpggle') {
-              subChild.style.pointerEvents = 'all';
+              // subChild.style.pointerEvents = 'all';
               subChild.addEventListener('pointerdown', pd => {gotoPosition()});
             }
           });
@@ -267,16 +265,16 @@ export default function initUI() {
     }
 
     // TODO: this also needs to be fixed
-    const messagesGroup = UIComponents.StateSwitches.Messages.getDomElement() as SVGGElement | SVGPathElement;
-    Array.from(messagesGroup.children as HTMLCollection).forEach(child => { 
-      const subElementName = child.getAttribute('vectornator:layerName');
-      if (subElementName === 'MessageTypes' || subElementName === 'NewMessageIcon') {
-        child.style.opacity = '0';
-      }
-    });
+    // const messagesGroup = UIComponents.StateSwitches.Messages.getDomElement() as SVGGElement | SVGPathElement;
+    // Array.from(messagesGroup.children as HTMLCollection).forEach(child => { 
+    //   const subElementName = child.getAttribute('vectornator:layerName');
+    //   if (subElementName === 'MessageTypes' || subElementName === 'NewMessageIcon') {
+    //     // child.style.opacity = '0';
+    //   }
+    // });
 
     // TODO: this also needs to be fixed
-    UIComponents.ModeChange.ModeList.setOpacity(0.0);
+    // UIComponents.ModeChange.ModeList.setOpacity(0.0);
   });
 
   let finalizeEnabled: boolean = false;
