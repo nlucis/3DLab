@@ -185,8 +185,52 @@ export default function initUI() {
     Array.from(UI.children as HTMLCollection).forEach(UILayer => {
 
       // Get, set, and save the state of the personal UI
+      class Part {
+        private _name: string;
+        public getName(): string {return this._name};
+        public properties: {[key:string]: string} = {};
+        public setProperty(propertyName: string, value: string): typeof this.properties {
+          this.parseProperties(this.domElement);
+          const hasProp = Object.keys(this.properties).includes(propertyName);
+          if (hasProp) {
+            this.domElement.setAttribute(propertyName, `${value}`);
+          }
+          return this.properties;
+        }
+        public getProperties(): typeof this.properties {
+          this.parseProperties(this.domElement);
+          return this.properties;
+        }
+        public domElement: SVGGElement | SVGAElement;
+
+        protected setName(to: string): string | false {
+          this._name = to;
+          return this._name || false;
+        }
+        public parseProperties = (partData: SVGAElement | SVGGElement) => {
+          partData.getAttributeNames().forEach(name => {
+            if (
+              name != 'clip-path' &&
+              name != 'clip-rule' && 
+              name != 'filter'    &&
+              name != 'id'        &&
+              !name.includes('vectornator:')
+            ) {
+              this.properties[name] = `${partData.getAttribute(name)}`;
+            }
+          });
+          return this.properties;
+        }
+        constructor (partData: SVGAElement | SVGGElement) {
+          this.domElement = partData;
+          this._name = partData.getAttribute('vectornator:layerName') || 'Unknown';
+          this.parseProperties(partData);
+        }
+      };
+
       class UIStateComponent {
         private _id: string | false;
+        public domElement: SVGGElement | SVGAElement;
         public getId(): string {
           return this._id;
         }
@@ -204,8 +248,15 @@ export default function initUI() {
         };
         protected setName(name: string): string | false {this._name = name ; return this._name};
 
-        constructor(ID?: string, domElement?: SVGGElement | SVGAElement) {
-          if (!ID) {
+        public parts: Part[] = [];
+
+        public setProperty(prop: string, value: string): void {
+          this.domElement.setAttribute(prop, value);
+        }
+
+        constructor(ID: string, domElement: SVGGElement | SVGAElement) {
+          this.domElement = domElement;
+          if (ID === '' || ID === null || ID === undefined) {
             this._id = generateUUID();
           } else {
             this._name = ID;
@@ -219,105 +270,56 @@ export default function initUI() {
               this._id = newID;
             });
           }
-
-          if (domElement) {
-            const foundLayerName = domElement.getAttribute('vectornator:layerName') || undefined;
+            const foundLayerName = domElement.getAttribute('vectornator:layerName') || domElement.getAttribute('id');
             if (foundLayerName) this._name = foundLayerName;
             else this._name = 'Unknown';
-          }
+            
+            Array.from(domElement.children).forEach(childElement => {
+              const part = new Part(childElement as SVGGElement | SVGAElement | SVGPathElement);
+              part.parseProperties(part.domElement);
+              if (part.getName() !== 'Unknown') this.parts.push(part);
+            });
         }
       }
-
       const comp = new UIStateComponent(UILayer.id, UILayer as SVGAElement | SVGGElement);
-      console.debug(comp);
+
+      // Set default states
+      comp.parts.forEach(part => {
+        const compName = comp.getName();
+        const partName = part.getName();
+        console.debug(compName, partName);
+        if (partName == 'ModeList') {
+          part.domElement.setAttribute('style', 'opacity: 0;');
+        }
+        if (
+          compName == 'TextWindow' ||
+          compName == 'Keypad'
+        ) {
+          comp.setProperty('style', 'opacity: 0;');
+        }
+        if (compName == 'PlaceWaypoint') {
+          console.debug(partName, part);
+          if (partName == 'Finalize') {
+            part.domElement.setAttribute('style', 'opacity: 0;');
+          }
+          part.setProperty('style', 'opacity: 0;');
+        }
+        if (compName == 'Interactron') {
+          if (part.getName() == 'ActiveState') {
+            part.domElement.setAttribute('style', 'opacity: 0;');
+          }
+        }
+        if (compName == 'WaypointType') {
+          comp.setProperty('style', 'opacity: 0;');
+        }
+
+        
+      });
     });
 
     // Add the IRIS UI to the DOM
     document.getElementById('UI')?.appendChild(UI);
-
-    // Create a list of all the target component keys
-    const componentNames: string[] = [];
-    const getKeys = async (fromObject: any, addTo?: string[]) => {
-      const keys = addTo || [];
-      return keys;
-    };
-    getKeys(UIComponents, componentNames).then(async () => {
-
-      const gNodes = document.getElementsByTagName('g');
-      const pathNodes = document.getElementsByTagName('path');
-
-      const parseNodes = (nodes: HTMLCollectionOf<SVGGElement | SVGPathElement>) => {
-        Array.from(nodes).forEach(node => {
-          const nodeName = node.getAttribute('vectornator:layerName');
-          if (nodeName !== null && componentNames.includes(nodeName)) {
-
-            // Top-Level components
-            if (UIComponents[nodeName] !== undefined) {
-              UIComponents[nodeName]['main'] = new UIComponent(node);
-            } 
-              
-            // Nested components
-            else {
-              const topLevel = Object.keys(UIComponents);
-              topLevel.forEach(key => {
-                if (UIComponents[key] && Object.keys(UIComponents[key]).includes(nodeName)) {
-                  UIComponents[key][nodeName] = new UIComponent(node);
-                }
-              });
-            }
-          }
-        })
-      };
-
-      parseNodes(gNodes);
-      parseNodes(pathNodes);
-    });
-  })
-  
-  // Setup the default state for each component
-  .then(() => {
-    UIComponents.Dialer.main?.setOpacity(0.0);
-    UIComponents.Keypad.main?.setOpacity(0.0);
-    UIComponents.TextDisplay.main?.setOpacity(0.0);
-    UIComponents.Visualizer.Oculum?.setOpacity(0.0);
-
-    // TODO: this works but shouldn't; fix population logic to resolve issue
-    // UIComponents.DataWaypointCreator.FinalizeAdd.setOpacity(0.0);
-    const addButton = UIComponents.DataWaypointCreator.AddButton?.getDomElement();
-    if (addButton) addButton.style.pointerEvents = 'all';
-    addButton?.addEventListener('pointerdown', pd => {
-      PlaceWaypoint();
-    });
-
-    // TODO: this too must be fixed
-    const stateSwitches = UIComponents.StateSwitches.main?.getDomElement();
-    if (stateSwitches) {
-      Array.from(stateSwitches.children as HTMLCollection).forEach(child => {
-        console.debug(child.getAttribute('vectornator:layerName'));
-        if (child.getAttribute('vectornator:layerName') === 'GyroscopeAndGeomap') {
-          Array.from(child.children as HTMLCollection).forEach(subChild => {
-            if (subChild.getAttribute('vectornator:layerName') === 'GeomapTpggle') {
-              // subChild.style.pointerEvents = 'all';
-              subChild.addEventListener('pointerdown', pd => {gotoPosition()});
-            }
-          });
-        }
-      });
-    }
-
-    // TODO: this also needs to be fixed
-    // const messagesGroup = UIComponents.StateSwitches.Messages.getDomElement() as SVGGElement | SVGPathElement;
-    // Array.from(messagesGroup.children as HTMLCollection).forEach(child => { 
-    //   const subElementName = child.getAttribute('vectornator:layerName');
-    //   if (subElementName === 'MessageTypes' || subElementName === 'NewMessageIcon') {
-    //     // child.style.opacity = '0';
-    //   }
-    // });
-
-    // TODO: this also needs to be fixed
-    // UIComponents.ModeChange.ModeList.setOpacity(0.0);
   });
-
   let finalizeEnabled: boolean = false;
 
   // Call Main() in SILVIC
