@@ -7,6 +7,7 @@ specifiers:
   '@types/three': ^0.152.1
   '@vitejs/plugin-basic-ssl': ^1.0.1
   cesium: ^1.107.2
+  idb: ^7.1.1
   pixi-svg-loader: ^1.3.0
   pixi.js: ^7.2.4
   three: ^0.154.0
@@ -20,6 +21,7 @@ dependencies:
   '@types/three': 0.152.1
   '@vitejs/plugin-basic-ssl': 1.0.1_vite@4.3.9
   cesium: 1.107.2
+  idb: 7.1.1
   pixi-svg-loader: 1.3.0
   pixi.js: 7.2.4
   three: 0.154.0
@@ -1122,6 +1124,10 @@ packages:
       assert-plus: 1.0.0
       jsprim: 1.4.2
       sshpk: 1.17.0
+    dev: false
+
+  /idb/7.1.1:
+    resolution: {integrity: sha512-gchesWBzyvGHRO9W8tzUWFDycow5gwjvFKfyV9FF32Y7F50yZMp7mP+T2mJIWFx49zicqyC4uefHM17o6xKIVQ==}
     dev: false
 
   /inherits/2.0.4:

@@ -4,6 +4,13 @@ import { SVGScene } from '@pixi-essentials/svg';
 import { PlaceWaypoint, gotoPosition } from "./Space";
 import { Type } from "typescript";
 import UIComponent from "../components/UIComponent";
+import { generateUUID } from "three/src/math/MathUtils";
+
+import {
+  openDB,
+  DBSchema,
+  IDBPDatabase
+} from 'idb';
 
 
 const readSVG = async (uri: string) => {return await SVGScene.from(uri)};
@@ -170,7 +177,8 @@ export default function initUI() {
 
   let textDisplay: UIComponent;
 
-  // Load the IRIS template SVG and parse it's structure for sub-elements and their properties
+  // Load the IRIS template SVG and parse it's structure for sub-elements and their properties then serialize them 
+  // into the client-user's local DB
   readSVG('public/assets/svgs/base/IRIS_All.svg').then(async svgData => {
     const UI = svgData.content;
 
@@ -178,11 +186,50 @@ export default function initUI() {
 
       // Get, set, and save the state of the personal UI
       class UIStateComponent {
-        constructor() {
-          
+        private _id: string | false;
+        public getId(): string {
+          return this._id;
+        }
+        protected setId(ID: string): string | false {
+          // if (AUTHORITY_TO_CHANGE) { /* Update the IndexDB entry */ return true; }
+          this._id = ID;
+          return this._id;
+        }
+        private _name: string | null;
+        public getName(): string {
+          if (this._name === null) {
+            this._name = 'Unknown';
+          }
+          return this._name;
+        };
+        protected setName(name: string): string | false {this._name = name ; return this._name};
+
+        constructor(ID?: string, domElement?: SVGGElement | SVGAElement) {
+          if (!ID) {
+            this._id = generateUUID();
+          } else {
+            this._name = ID;
+            let newID = '';
+            Array.from(ID).forEach((charVal: string, charNum: number) => {
+              newID += `${
+                charNum === 0 ? charVal.toLocaleLowerCase() 
+                : (charVal === Array.from(ID)[charNum].toLocaleLowerCase()) ? charVal 
+                  : `-${charVal.toLocaleLowerCase()}`
+              }`;
+              this._id = newID;
+            });
+          }
+
+          if (domElement) {
+            const foundLayerName = domElement.getAttribute('vectornator:layerName') || undefined;
+            if (foundLayerName) this._name = foundLayerName;
+            else this._name = 'Unknown';
+          }
         }
       }
-      console.debug(UILayer.id);
+
+      const comp = new UIStateComponent(UILayer.id, UILayer as SVGAElement | SVGGElement);
+      console.debug(comp);
     });
 
     // Add the IRIS UI to the DOM
@@ -192,12 +239,6 @@ export default function initUI() {
     const componentNames: string[] = [];
     const getKeys = async (fromObject: any, addTo?: string[]) => {
       const keys = addTo || [];
-
-
-      Object.keys(fromObject).forEach(key => {
-        console.debug(fromObject, fromObject[key]);
-
-      });
       return keys;
     };
     getKeys(UIComponents, componentNames).then(async () => {
