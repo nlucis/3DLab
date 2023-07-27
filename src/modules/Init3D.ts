@@ -60,7 +60,7 @@ export default function init3D() {
     Visualizer.rotation.y -= 0.003;
     Visualizer.rotation.z += 0.009;
   });
-  Visualizer.position.set(0, 22.2, 0);
+  Visualizer.position.set(0, 18.3, 0);
 
   // Using a circle limited to 3 segments to create a 2D triangle
   const gTetraBack = new THREE.CircleGeometry(5, 3);
