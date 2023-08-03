@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Created with Vectornator (http://vectornator.io/) -->
+<svg height="100%" stroke-miterlimit="10" style="fill-rule:nonzero;clip-rule:evenodd;stroke-linecap:round;stroke-linejoin:round;" version="1.1" viewBox="0 0 2400 2400" width="100%" xml:space="preserve" xmlns="http://www.w3.org/2000/svg" xmlns:vectornator="http://vectornator.io" xmlns:xlink="http://www.w3.org/1999/xlink">
+<defs/>
+<g id="main" vectornator:layerName="main">
+<g opacity="1" vectornator:layerName="horizontal">
+<path d="M1327.87 1203C1317.61 1203 1071.63 1203 1071.63 1203" fill="none" stroke="#ffffff" stroke-linecap="butt" stroke-linejoin="round" stroke-width="3"/>
+<g fill="#ffffff" stroke="none">
+<path d="M1073.13 1194L1070.13 1194L1070.13 1212L1073.13 1212L1073.13 1194Z" fill="#ffffff"/>
+<path d="M1326.37 1212L1329.37 1212L1329.37 1194L1326.37 1194L1326.37 1212Z" fill="#ffffff"/>
+</g>
+</g>
+<g opacity="1" vectornator:layerName="vertical">
+<path d="M1199.75 1328.75C1199.75 1313.56 1199.75 1074.88 1199.75 1074.88" fill="none" stroke="#ffffff" stroke-linecap="butt" stroke-linejoin="round" stroke-width="3"/>
+<g fill="#ffffff" stroke="none">
+<path d="M1208.75 1076.38L1208.75 1073.38L1190.75 1073.38L1190.75 1076.38L1208.75 1076.38Z" fill="#ffffff"/>
+<path d="M1189.59 1320.2L1198.59 1331.2L1199.75 1332.62L1200.91 1331.2L1209.91 1320.2C1210.44 1319.56 1210.34 1318.62 1209.7 1318.09C1209.06 1317.57 1208.12 1317.66 1207.59 1318.3L1198.59 1329.3L1200.91 1329.3L1191.91 1318.3C1191.39 1317.66 1190.44 1317.57 1189.8 1318.09C1189.16 1318.62 1189.07 1319.56 1189.59 1320.2Z" fill="#ffffff"/>
+</g>
+</g>
+<path d="M1190 1203C1190 1197.62 1194.37 1193.25 1199.75 1193.25C1205.13 1193.25 1209.5 1197.62 1209.5 1203C1209.5 1208.38 1205.13 1212.75 1199.75 1212.75C1194.37 1212.75 1190 1208.38 1190 1203Z" fill="#dc4c30" fill-rule="nonzero" opacity="1" stroke="#ffffff" stroke-linecap="butt" stroke-linejoin="round" stroke-width="2.13727" vectornator:layerName="centroid"/>
+</g>
+</svg>

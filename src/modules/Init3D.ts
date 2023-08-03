@@ -60,33 +60,18 @@ export default function init3D() {
     Visualizer.rotation.y -= 0.003;
     Visualizer.rotation.z += 0.009;
   });
-  Visualizer.position.set(0, 18.3, 0);
+  Visualizer.position.set(0, 23.65, 0);
 
-  // Using a circle limited to 3 segments to create a 2D triangle
-  const gTetraBack = new THREE.CircleGeometry(5, 3);
-  const mTetraBack = new THREE.MeshBasicMaterial({ 
-    color: 0x2F5CA6,
-    side: THREE.BackSide
-  });
-  const TetraBack = new THREE.Mesh(gTetraBack, mTetraBack);
-
-  // Alignment with visualizer
-  TetraBack.rotation.z = THREE.MathUtils.degToRad(90);
-  TetraBack.position.set(Visualizer.position.x, Visualizer.position.y + 0.6, Visualizer.position.z + 3);
-
-  Scene.add(
-    Visualizer,
-    TetraBack
-  );
+  Scene.add(Visualizer);
   // Simulate vox flashing
-  let opacityMax = 6.0;
-  let opacityMin = 0.6;
+  let opacityMax = 3.0;
+  let opacityMin = 0.3;
   setInterval(() => {
     mPoints.opacity = THREE.MathUtils.randFloat(opacityMin, opacityMax);
   }, 64);
 
   // Convert the Cesium globe canvas to a texture for layering as well
-  const cesiumTex = new THREE.CanvasTexture(window['geomapCanvas']);
+  // const cesiumTex = new THREE.CanvasTexture(window['geomapCanvas']);
 
   // Post-Processing
   const composer = new EffectComposer(Renderer);
@@ -105,16 +90,16 @@ export default function init3D() {
   );
 
   /* NOTE: clear alphas must be a value less than 1 or the TAA pass wont show */
-  composer.addPass(new TAARenderPass(Scene, Camera, 0x120A0E, 1.0));
-  composer.addPass(new TexturePass(cesiumTex, 0.64)); // if the alpha is too high, bloom ends up over-exposing the layer
+  composer.addPass(new TAARenderPass(Scene, Camera, 0x1A1A27, 0.3));
+  // composer.addPass(new TexturePass(cesiumTex, 0.64)); // if the alpha is too high, bloom ends up over-exposing the layer
 
   composer.addPass(bloom);
   composer.addPass(scan);
   composer.addPass(smaa);
 
   PIXI.Ticker.shared.add(() => {
-    cesiumTex.needsUpdate = true;
-    geomap.render();
+    // cesiumTex.needsUpdate = true;
+    // geomap.render();
     composer.render();
   }); 
 

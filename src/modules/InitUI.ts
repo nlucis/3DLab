@@ -12,6 +12,26 @@ import {
   IDBPDatabase
 } from 'idb';
 
+class TextWindow {
+  private TextFrame: SVGAElement | SVGGElement | SVGPathElement | SVGUseElement;
+  private self: SVGAElement | SVGGElement | SVGPathElement;
+  public isVisible: boolean = false;
+  public toggleVisibility(): void {
+    console.debug(this.isVisible);
+    this.isVisible = !this.isVisible;
+    this.self.setAttribute('style', `'opacity: ${this.isVisible ? 1 : 0};`)
+    this.self.style.opacity = `${this.isVisible ? 1 : 0};`;
+  }
+  constructor(domElement: SVGAElement | SVGGElement | SVGPathElement) {
+    this.self = domElement;
+    const textFrame = Array.from(domElement.children).filter(child => {
+      return (child.getAttribute('vectornator:layerName') == 'TextFrame')
+    })[0];
+    this.TextFrame = textFrame as SVGUseElement;
+    domElement.style.opacity = '0';
+  }
+}
+
 
 const readSVG = async (uri: string) => {return await SVGScene.from(uri)};
 
@@ -174,154 +194,26 @@ export default function initUI() {
 
   const centerX = window.innerWidth / 2;
   const centerY = window.innerHeight / 2;
+  const windowWidth = window.innerWidth;
+  const windowHeight = window.innerHeight;
 
+  console.debug(
+    `\nWindow Width:`, windowWidth, 
+    `\nWindow Height:`, windowHeight, 
+    `\nCX:`, centerX, 
+    `\nCY:`, centerY
+  );
   let textDisplay: UIComponent;
 
   // Load the IRIS template SVG and parse it's structure for sub-elements and their properties then serialize them 
   // into the client-user's local DB
-  readSVG('public/assets/svgs/base/IRIS_All.svg').then(async svgData => {
-    const UI = svgData.content;
 
-    Array.from(UI.children as HTMLCollection).forEach(UILayer => {
-
-      // Get, set, and save the state of the personal UI
-      class Part {
-        private _name: string;
-        public getName(): string {return this._name};
-        public properties: {[key:string]: string} = {};
-        public setProperty(propertyName: string, value: string): typeof this.properties {
-          this.parseProperties(this.domElement);
-          const hasProp = Object.keys(this.properties).includes(propertyName);
-          if (hasProp) {
-            this.domElement.setAttribute(propertyName, `${value}`);
-          }
-          return this.properties;
-        }
-        public getProperties(): typeof this.properties {
-          this.parseProperties(this.domElement);
-          return this.properties;
-        }
-        public domElement: SVGGElement | SVGAElement;
-
-        protected setName(to: string): string | false {
-          this._name = to;
-          return this._name || false;
-        }
-        public parseProperties = (partData: SVGAElement | SVGGElement) => {
-          partData.getAttributeNames().forEach(name => {
-            if (
-              name != 'clip-path' &&
-              name != 'clip-rule' && 
-              name != 'filter'    &&
-              name != 'id'        &&
-              !name.includes('vectornator:')
-            ) {
-              this.properties[name] = `${partData.getAttribute(name)}`;
-            }
-          });
-          return this.properties;
-        }
-        constructor (partData: SVGAElement | SVGGElement) {
-          this.domElement = partData;
-          this._name = partData.getAttribute('vectornator:layerName') || 'Unknown';
-          this.parseProperties(partData);
-        }
-      };
-
-      class UIStateComponent {
-        private _id: string | false;
-        public domElement: SVGGElement | SVGAElement;
-        public getId(): string {
-          return this._id;
-        }
-        protected setId(ID: string): string | false {
-          // if (AUTHORITY_TO_CHANGE) { /* Update the IndexDB entry */ return true; }
-          this._id = ID;
-          return this._id;
-        }
-        private _name: string | null;
-        public getName(): string {
-          if (this._name === null) {
-            this._name = 'Unknown';
-          }
-          return this._name;
-        };
-        protected setName(name: string): string | false {this._name = name ; return this._name};
-
-        public parts: Part[] = [];
-
-        public setProperty(prop: string, value: string): void {
-          this.domElement.setAttribute(prop, value);
-        }
-
-        constructor(ID: string, domElement: SVGGElement | SVGAElement) {
-          this.domElement = domElement;
-          if (ID === '' || ID === null || ID === undefined) {
-            this._id = generateUUID();
-          } else {
-            this._name = ID;
-            let newID = '';
-            Array.from(ID).forEach((charVal: string, charNum: number) => {
-              newID += `${
-                charNum === 0 ? charVal.toLocaleLowerCase() 
-                : (charVal === Array.from(ID)[charNum].toLocaleLowerCase()) ? charVal 
-                  : `-${charVal.toLocaleLowerCase()}`
-              }`;
-              this._id = newID;
-            });
-          }
-            const foundLayerName = domElement.getAttribute('vectornator:layerName') || domElement.getAttribute('id');
-            if (foundLayerName) this._name = foundLayerName;
-            else this._name = 'Unknown';
-            
-            Array.from(domElement.children).forEach(childElement => {
-              const part = new Part(childElement as SVGGElement | SVGAElement | SVGPathElement);
-              part.parseProperties(part.domElement);
-              if (part.getName() !== 'Unknown') this.parts.push(part);
-            });
-        }
-      }
-      const comp = new UIStateComponent(UILayer.id, UILayer as SVGAElement | SVGGElement);
-
-      // Set default states
-      comp.parts.forEach(part => {
-        const compName = comp.getName();
-        const partName = part.getName();
-        console.debug(compName, partName);
-        if (partName == 'ModeList') {
-          part.domElement.setAttribute('style', 'opacity: 0;');
-        }
-        if (
-          compName == 'TextWindow' ||
-          compName == 'Keypad'
-        ) {
-          comp.setProperty('style', 'opacity: 0;');
-        }
-        if (compName == 'PlaceWaypoint') {
-          console.debug(partName, part);
-          if (partName == 'Finalize') {
-            part.domElement.setAttribute('style', 'opacity: 0;');
-          }
-          part.setProperty('style', 'opacity: 0;');
-        }
-        if (compName == 'Interactron') {
-          if (part.getName() == 'ActiveState') {
-            part.domElement.setAttribute('style', 'opacity: 0;');
-          }
-        }
-        if (compName == 'WaypointType') {
-          comp.setProperty('style', 'opacity: 0;');
-        }
-
-        
-      });
+  /* -- Load Base UI according to display orientation */
+    readSVG(`public/assets/svgs/base/MinimalUI.svg`).then(async svgData => {
+      const UI = svgData.content;
+      document.getElementById('UI')?.appendChild(UI);
     });
 
-    // Add the IRIS UI to the DOM
-    document.getElementById('UI')?.appendChild(UI);
-  });
-  let finalizeEnabled: boolean = false;
-
-  // Call Main() in SILVIC
+  // Main Loop in SILVIC
   Main();
 }

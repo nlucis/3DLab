@@ -12,9 +12,9 @@ export function setGlobeInit(setter: boolean) { globeInitialized = setter }
 
 window.addEventListener('DOMContentLoaded', () => {
   // Inits
-  // init3D();
-  // initUI();
-  InitGlobe();
+  init3D();
+  initUI();
+  // InitGlobe();
 
   // Render loop
   // const render = () => {
