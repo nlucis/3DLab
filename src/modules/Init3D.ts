@@ -10,6 +10,7 @@ import {EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer'
 import { ArcballControls } from 'three/examples/jsm/controls/ArcballControls';
 import { geomap } from "./Space";
 import * as PIXI from 'pixi.js';
+import { renderTarget } from "..";
 
 export let Camera: THREE.PerspectiveCamera;
 export let Renderer: THREE.WebGLRenderer;
@@ -47,7 +48,7 @@ export default function init3D() {
   const gPoints = new THREE.IcosahedronGeometry(2, 6);
   const mPoints = new THREE.PointsMaterial({
     name: 'point-sphere',
-    color: 0xEFAC70,
+    color: 0x1A9CEC,
     size: 0.1,
     opacity: 1.0,
     blending: THREE.AdditiveBlending,
@@ -89,20 +90,22 @@ export default function init3D() {
     0
   );
 
+  const phaserTex = new THREE.CanvasTexture(renderTarget);
+
   /* NOTE: clear alphas must be a value less than 1 or the TAA pass wont show */
   composer.addPass(new TAARenderPass(Scene, Camera, 0x1A1A27, 0.3));
-  // composer.addPass(new TexturePass(cesiumTex, 0.64)); // if the alpha is too high, bloom ends up over-exposing the layer
+  composer.addPass(new TexturePass(phaserTex, 0.64)); // if the alpha is too high, bloom ends up over-exposing the layer
 
   composer.addPass(bloom);
   composer.addPass(scan);
   composer.addPass(smaa);
 
   PIXI.Ticker.shared.add(() => {
-    // cesiumTex.needsUpdate = true;
+    phaserTex.needsUpdate = true;
     // geomap.render();
     composer.render();
   }); 
 
   // Chain #4
-  initUI();
+  // initUI();
 }

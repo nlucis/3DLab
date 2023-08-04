@@ -211,9 +211,33 @@ export default function initUI() {
   /* -- Load Base UI according to display orientation */
     readSVG(`public/assets/svgs/base/MinimalUI.svg`).then(async svgData => {
       const UI = svgData.content;
+
+      // Extract props for rebuilding layout components
+      let x = 0;
+      let y = 0;
+      let elWidth = windowWidth;
+      let elHeight = windowHeight;
+      const viewBox = `${centerX} ${centerY} ${elWidth} ${elHeight}`;
+      UI.setAttribute('viewBox', viewBox);
+
+      const mainLayout = UI.getElementById('Layer-1');
+      const usageSpinner = (
+        Array
+        .from(mainLayout?.children as HTMLCollection)
+        .filter(child => {if (child.getAttribute('vectornator:layerName') === 'UsageSpinner') return child})[0] as SVGElement
+      );
+
       document.getElementById('UI')?.appendChild(UI);
     });
 
+
   // Main Loop in SILVIC
+  animate();
   Main();
 }
+
+const animations: Function[] = [];
+const animate = () => {
+  animations.forEach(anim => anim());
+  requestAnimationFrame(animate);
+};
