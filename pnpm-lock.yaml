@@ -7,6 +7,7 @@ specifiers:
   '@types/three': ^0.152.1
   '@vitejs/plugin-basic-ssl': ^1.0.1
   cesium: ^1.107.2
+  dotenv: ^16.3.1
   idb: ^7.1.1
   phaser: ^3.60.0
   pixi-svg-loader: ^1.3.0
@@ -22,6 +23,7 @@ dependencies:
   '@types/three': 0.152.1
   '@vitejs/plugin-basic-ssl': 1.0.1_vite@4.3.9
   cesium: 1.107.2
+  dotenv: 16.3.1
   idb: 7.1.1
   phaser: 3.60.0
   pixi-svg-loader: 1.3.0
@@ -924,6 +926,11 @@ packages:
 
   /dompurify/3.0.5:
     resolution: {integrity: sha512-F9e6wPGtY+8KNMRAVfxeCOHU0/NPWMSENNq4pQctuXRqqdEPW7q3CrLbR5Nse044WwacyjHGOMlvNsBe1y6z9A==}
+    dev: false
+
+  /dotenv/16.3.1:
+    resolution: {integrity: sha512-IPzF4w4/Rd94bA9imS68tZBaYyBWSCE47V1RGuMrB94iyTOIEwRmVL2x/4An+6mETpLrKJ5hQkB8W4kFAadeIQ==}
+    engines: {node: '>=12'}
     dev: false
 
   /earcut/2.2.4:

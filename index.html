@@ -13,12 +13,7 @@
     <link rel="manifest" href=".webmanifest">
     <link rel="apple-touch-icon" href="assets/icons/icon_192x192.png">
 
-  <!-- CesiumJS JavaScript and CSS files -->
-  <script src="https://cesium.com/downloads/cesiumjs/releases/1.107.1/Build/Cesium/Cesium.js"></script>
-  <link href="https://cesium.com/downloads/cesiumjs/releases/1.107.1/Build/Cesium/Widgets/widgets.css" rel="stylesheet" type="text/css">
-
   <!-- Core Font & Global styles -->
-  <link href="" rel="styles" type="text/css">
   <link rel="stylesheet" type="text/css" href="public/styles/global.css">
 
   <!-- Preload Scripts -->
@@ -27,9 +22,7 @@
 </head>
 <body>
   <main>
-    <section id="UI"></section>
     <canvas id="target"></canvas>
-    <div id="geomap"></div>
 
     <span id="copyright-notice">
       Copyright &copy; 2023 All Rights Reserved.
@@ -38,9 +31,6 @@
   </main>
 
   <footer>
-    <!-- FSM -->
-    <script type="module" src="src/SILVIC.ts"></script>
-    
     <!-- PWA -->
     <!-- <script type="module" src="sw.js"></script> -->
     <!-- <script type="text/javascript" id="app-installer">
@@ -62,6 +52,5 @@
       }
     </script> -->
   </footer>
-  <div class="no-show"></div>
 </body>
 </html>

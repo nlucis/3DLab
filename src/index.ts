@@ -1,99 +1,71 @@
 // import * as Cesium from 'cesium';
 import * as Phaser from 'phaser';
-import init3D from './modules/Init3D';
-import { Scene } from './modules/Init3D';
-export const onAnimate: {(): void}[] = [];
+import initRendering from './modules/InitRendering';
+import PhaserConf from './configs/PhaserConf';
 
-export const winWidth = window.innerWidth;
-export const winHeight = window.innerHeight;
-export const cx = winWidth / 2;
-export const cy = winHeight / 2;
+// Globals
+const winWidth = window.innerWidth;
+const winHeight = window.innerHeight;
+const cx = winWidth / 2;
+const cy = winHeight / 2
+
+// 2D Context
 export const renderTarget = new OffscreenCanvas(winWidth, winHeight);
+renderTarget.oncontextlost = (ctx) => {};
+renderTarget.oncontextrestored = (ctx) => {};
+const context2D = renderTarget.getContext('2d');
+
 
 // Using Phaser because despite being a game engine, it does everything I need and more
 window.addEventListener('DOMContentLoaded', async () => {
 
-    class scene extends Phaser.Scene {
+
+  class boot extends Phaser.Scene {
     constructor() {
-      super('scene');
+      super('scene');  ;
     }
+
     init(): void {
-        console.debug('inittin');
-        this.cameras.main.setBackgroundColor(0xFFAC00);
+      this.cameras.main.centerOn(0, 0);
+      this.cameras.main.setBackgroundColor(0x1A1A27);
     }
-      create(): void {}
 
-      update(): void {}
+    create(): void {
+      const image =this.add.image(0, 0, 'untitled').setOrigin();
+      this.events.on('update', () => {
+        // image.x++;
+      });
+      console.debug(image);
+    }
 
-      preload(): void {}
+    update(): void {}
+
+    // Use readSVG to break apart the layout into it's component elements then load them into phaser's cache
+    preload(): void {
+        const metaDevice = this.load.svg('untitled', 'assets/svgs/nu-interactron.svg', {
+          scale: 10
+        });
+        console.debug(metaDevice);
+    }
   }
 
-  renderTarget.oncontextlost = (ctx) => {};
-  renderTarget.oncontextrestored = (ctx) => {};
-  const context2D = renderTarget.getContext('2d');
+const winWidth = window.innerWidth;
+const winHeight = window.innerHeight;
+const cx = winWidth / 2;
+const cy = winHeight / 2;
 
-  console.debug(renderTarget, context2D);
-  const app = new Phaser.Game({
-    antialias: true,
-    antialiasGL: true,
-    // audio: {context},
-    autoCenter: Phaser.Scale.CENTER_BOTH,
-    autoMobilePipeline: true,
-    autoFocus: true,
-    autoRound: true,
-    backgroundColor: 0xFFAC00,
-    // canvas
-    // canvasStyle
+  // Views
+  const App = new Phaser.Game({...PhaserConf, 
 
-    type: Phaser.CANVAS,
     // @ts-ignore | Phaser absolutely does support offscreen canvas, but the typedefs dont reflect this
     context: context2D as CanvasRenderingContext2D,
 
-    callbacks: {
-      preBoot: () => {}, 
-      postBoot: () => {}
-    },
-
-    desynchronized: true,
-    disableContextMenu: true,
-    // dom
-    expandParent: true,
-    failIfMajorPerformanceCaveat: true,
-    // fullscreenTarget
-
-    // width: winWidth - 12,
-    // height: winHeight - 12,
-
-    // images
-    // input: 
-    // loader
-    mode: Phaser.Scale.RESIZE,
-    // max
-    // min
-    // parent
-    // pipeline
-    physics: {
-      default: 'matter',
-      matter: {
-        "plugins.attractors": true,
-        autoUpdate: true,
-        constraintIterations: 32,
-        debug: true,
-        enabled: true,
-        gravity: {x: 0, y: 0},
-        positionIterations: 32,
-        velocityIterations: 32,
-      }
-    },
-    // render
-    // scale
-    scene: scene,
-    transparent: true,
-    
-    
-    title: 'TILLI - Talking Interlocutive Large-Language Interface |',
-    version: '0.1\n',
-    url: 'https://nlucis.github.io/tilli'
+    width: winWidth,
+    height: winHeight,
+    scene: [
+      boot
+    ],
   });
-  init3D();
+
+  initRendering(App);
 });
